@@ -1,0 +1,17 @@
+{
+  "name": "Cocheira RADAMÉS — Controle de Treinos",
+  "short_name": "RADAMÉS",
+  "description": "Gestão dos treinos dos cavalos da Cocheira RADAMÉS.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f6f2e9",
+  "theme_color": "#102f24",
+  "lang": "pt-BR",
+  "icons": [
+    {"src":"/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
+    {"src":"/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"},
+    {"src":"/horse.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}
