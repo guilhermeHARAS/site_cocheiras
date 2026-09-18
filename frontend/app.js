@@ -48,11 +48,13 @@ function horseCard(horse) {
   const done = horse.workouts >= GOAL;
   const percentage = Math.round((horse.workouts / GOAL) * 100);
   const safePercentage = Math.min(100, Math.max(0, percentage));
+  const pedigree = [horse.father, horse.mother].filter(Boolean).map(escapeHtml).join(' × ');
   return `<article class="horse-card${done ? ' is-done' : ''}">
     <div class="horse-card__photo">${horse.photo ? `<img src="${horse.photo}" alt="Foto de ${escapeHtml(horse.name)}">` : '<span>R</span>'}</div>
     <div class="horse-card__body">
       <h2>${escapeHtml(horse.name)}${done ? '<span class="star">★</span>' : ''}</h2>
       <p class="horse-card__breed">${escapeHtml(horse.breed || 'Raça não informada')}</p>
+      ${pedigree ? `<p class="horse-card__pedigree"><span>Filiação</span>${pedigree}</p>` : ''}
       <div class="horse-card__count">${done ? `★ Meta alcançada — ${horse.workouts}` : `${horse.workouts} treinos de ${GOAL}`}</div>
       <div class="progress"><span style="width:${safePercentage}%"></span></div>
       <div class="horse-card__meta"><span>${percentage}% da meta</span>${done ? '<b>Concluída</b>' : ''}</div>
@@ -68,7 +70,7 @@ function render() {
   $('#total').textContent = state.horses.length;
   $('#goals').textContent = state.horses.filter(h => h.workouts >= GOAL).length;
   const query = state.query.trim().toLocaleLowerCase('pt-BR');
-  let list = state.horses.filter(h => h.name.toLocaleLowerCase('pt-BR').includes(query));
+  let list = state.horses.filter(h => [h.name, h.father, h.mother].some(value => String(value || '').toLocaleLowerCase('pt-BR').includes(query)));
   if (state.filter === 'training') list = list.filter(h => h.workouts < GOAL);
   if (state.filter === 'goal') list = list.filter(h => h.workouts >= GOAL);
   $('#horseGrid').innerHTML = list.length
@@ -99,7 +101,7 @@ function openEdit(id) {
   state.editing = id;
   clearForm();
   $('#modalTitle').textContent = 'Editar cavalo';
-  ['name', 'breed', 'sex', 'owner', 'notes'].forEach(key => $(`#${key}`).value = horse[key] || '');
+  ['name', 'breed', 'sex', 'owner', 'father', 'mother', 'notes'].forEach(key => $(`#${key}`).value = horse[key] || '');
   $('#age').value = horse.age ?? '';
   $('#workouts').value = horse.workouts;
   $('#photo').dataset.current = horse.photo || '';
@@ -204,7 +206,7 @@ $('#horseForm').addEventListener('submit', async event => {
   saveButton.disabled = true;
   saveButton.textContent = 'Salvando…';
   try {
-    const horse = { name, photo: await readPhoto($('#photo').files[0]), breed: $('#breed').value.trim(), age: $('#age').value, sex: $('#sex').value, owner: $('#owner').value.trim(), workouts: $('#workouts').value, notes: $('#notes').value.trim() };
+    const horse = { name, photo: await readPhoto($('#photo').files[0]), breed: $('#breed').value.trim(), age: $('#age').value, sex: $('#sex').value, owner: $('#owner').value.trim(), father: $('#father').value.trim(), mother: $('#mother').value.trim(), workouts: $('#workouts').value, notes: $('#notes').value.trim() };
     state.editing ? await api.updateHorse(state.editing, horse) : await api.createHorse(horse);
     $('#horseModal').close();
     await loadHorses();

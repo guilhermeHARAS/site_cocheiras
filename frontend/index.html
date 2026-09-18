@@ -9,6 +9,9 @@
   <title>Cocheira RADAMÉS</title>
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="icon" href="/horse.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
@@ -72,6 +75,8 @@
         <label class="field"><span>Idade</span><input id="age" type="number" min="0" max="60"></label>
         <label class="field"><span>Sexo</span><select id="sex"><option value="">Não informado</option><option>Macho</option><option>Fêmea</option><option>Castrado</option></select></label>
         <label class="field"><span>Proprietário</span><input id="owner" maxlength="100"></label>
+        <label class="field"><span>Pai</span><input id="father" maxlength="80" placeholder="Nome do pai"></label>
+        <label class="field"><span>Mãe</span><input id="mother" maxlength="80" placeholder="Nome da mãe"></label>
         <label class="field"><span>Quantidade de treinos</span><input id="workouts" type="number" min="0" value="0"></label>
         <label class="field field--full"><span>Observações</span><textarea id="notes" maxlength="600"></textarea></label>
       </div>

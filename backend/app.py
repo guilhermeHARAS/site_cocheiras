@@ -198,6 +198,8 @@ class Handler(BaseHTTPRequestHandler):
             "id": horse_id or uuid.uuid4().hex,
             "name": name[:80], "photo": photo, "breed": str(payload.get("breed", "")).strip()[:80],
             "age": age, "sex": str(payload.get("sex", ""))[:20],
+            "father": str(payload.get("father", "")).strip()[:80],
+            "mother": str(payload.get("mother", "")).strip()[:80],
             "owner": str(payload.get("owner", "")).strip()[:100],
             "notes": str(payload.get("notes", "")).strip()[:600],
             "workouts": workouts, "lastWorkout": None,
