@@ -10,6 +10,11 @@ from typing import Any
 DATA_DIR = Path(__file__).resolve().parent / "data"
 STORE_FILE = DATA_DIR / "store.json"
 DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
+DATABASE_PASSWORD = os.environ.get("DATABASE_PASSWORD", "")
+DATABASE_HOST = os.environ.get("DATABASE_HOST", "").strip()
+DATABASE_USER = os.environ.get("DATABASE_USER", "").strip()
+DATABASE_NAME = os.environ.get("DATABASE_NAME", "postgres").strip()
+DATABASE_CONFIGURED = bool(DATABASE_URL or DATABASE_PASSWORD)
 _lock = threading.RLock()
 
 
@@ -25,12 +30,25 @@ def _normalize(data: dict[str, Any]) -> dict[str, Any]:
     data.setdefault("horses", [])
     return data
 
-if DATABASE_URL:
+if DATABASE_CONFIGURED:
     try:
         import psycopg
         from psycopg.types.json import Jsonb
     except ImportError as exc:
         raise RuntimeError("Instale as dependências com: pip install -r requirements.txt") from exc
+
+
+def _connect():
+    if DATABASE_PASSWORD:
+        return psycopg.connect(
+            host=DATABASE_HOST,
+            dbname=DATABASE_NAME,
+            user=DATABASE_USER,
+            password=DATABASE_PASSWORD,
+            connect_timeout=10,
+            sslmode="require",
+        )
+    return psycopg.connect(DATABASE_URL, connect_timeout=10, sslmode="require")
 
 
 def _ensure() -> None:
@@ -40,8 +58,8 @@ def _ensure() -> None:
 
 
 def load() -> dict[str, Any]:
-    if DATABASE_URL:
-        with psycopg.connect(DATABASE_URL, connect_timeout=10, sslmode="require") as connection:
+    if DATABASE_CONFIGURED:
+        with _connect() as connection:
             _ensure_database(connection)
             row = connection.execute("SELECT data FROM app_state WHERE id = 1").fetchone()
             return _normalize(row[0] if row else _empty_state())
@@ -55,8 +73,8 @@ def load() -> dict[str, Any]:
 
 
 def save(data: dict[str, Any]) -> None:
-    if DATABASE_URL:
-        with psycopg.connect(DATABASE_URL, connect_timeout=10, sslmode="require") as connection:
+    if DATABASE_CONFIGURED:
+        with _connect() as connection:
             _ensure_database(connection)
             connection.execute("UPDATE app_state SET data = %s WHERE id = 1", (Jsonb(data),))
         return
@@ -70,8 +88,8 @@ def save(data: dict[str, Any]) -> None:
 
 
 def update(mutator):
-    if DATABASE_URL:
-        with psycopg.connect(DATABASE_URL, connect_timeout=10, sslmode="require") as connection:
+    if DATABASE_CONFIGURED:
+        with _connect() as connection:
             _ensure_database(connection)
             row = connection.execute("SELECT data FROM app_state WHERE id = 1 FOR UPDATE").fetchone()
             data = _normalize(row[0] if row else _empty_state())

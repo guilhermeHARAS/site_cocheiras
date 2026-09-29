@@ -28,6 +28,6 @@ O projeto inclui `render.yaml` para publicar o servidor gratuitamente no Render 
 2. Em **Connect**, copie a conexão **Session pooler** e substitua `[YOUR-PASSWORD]` pela senha do banco.
 3. Envie este projeto para um repositório GitHub.
 4. No Render, crie um **Blueprint** usando o repositório.
-5. Quando solicitado, informe a conexão do Supabase na variável secreta `DATABASE_URL`.
+5. Quando solicitado, informe somente a senha do banco do Supabase na variável secreta `DATABASE_PASSWORD`.
 
 Não coloque a conexão do banco dentro do código ou do GitHub.
