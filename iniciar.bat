@@ -5,13 +5,13 @@ cd /d "%~dp0"
 where python >nul 2>nul
 if errorlevel 1 goto use_py
 
-python backend\app.py
+python backend\app.py --host 0.0.0.0
 goto finished
 
 :use_py
 where py >nul 2>nul
 if errorlevel 1 goto no_python
-py -3 backend\app.py
+py -3 backend\app.py --host 0.0.0.0
 goto finished
 
 :no_python

@@ -7,6 +7,7 @@ import json
 import mimetypes
 import os
 import re
+import socket
 import uuid
 import webbrowser
 from datetime import date
@@ -260,8 +261,19 @@ def main():
     parser.add_argument("--no-browser", action="store_true")
     args = parser.parse_args()
     server = ThreadingHTTPServer((args.host, args.port), Handler)
-    url = f"http://{args.host}:{args.port}"
-    print(f"Cocheira RADAMÉS disponível em {url}\nPressione Ctrl+C para encerrar.")
+    browser_host = "127.0.0.1" if args.host in ("0.0.0.0", "::") else args.host
+    url = f"http://{browser_host}:{args.port}"
+    lines = [f"Cocheira RADAMÉS disponível neste computador: {url}"]
+    if args.host == "0.0.0.0":
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as probe:
+                probe.connect(("8.8.8.8", 80))
+                local_ip = probe.getsockname()[0]
+            lines.append(f"No celular conectado ao mesmo Wi-Fi: http://{local_ip}:{args.port}")
+        except OSError:
+            lines.append("No celular, use o endereço IPv4 deste computador seguido de :8000.")
+    lines.append("Pressione Ctrl+C para encerrar.")
+    print("\n".join(lines))
     if not args.no_browser:
         Timer(0.7, lambda: webbrowser.open(url)).start()
     try:
