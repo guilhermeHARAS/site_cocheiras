@@ -1,4 +1,4 @@
-"""Autenticação local com PBKDF2 e sessões em memória."""
+"""Autenticação com PBKDF2 e sessões persistentes."""
 from __future__ import annotations
 
 import hashlib
@@ -7,8 +7,7 @@ import secrets
 import time
 
 ITERATIONS = 240_000
-SESSION_TTL = 60 * 60 * 12
-_sessions: dict[str, float] = {}
+SESSION_TTL = 60 * 60 * 24 * 90
 
 
 def new_password_record(email: str, password: str) -> dict[str, str | int]:
@@ -37,21 +36,33 @@ def verify(account: dict, email: str, password: str) -> bool:
         return False
 
 
-def create_session() -> str:
+def _token_id(token: str) -> str:
+    return hashlib.sha256(token.encode()).hexdigest()
+
+
+def create_session(data: dict, email: str) -> str:
     token = secrets.token_urlsafe(32)
-    _sessions[token] = time.time() + SESSION_TTL
+    sessions = data.setdefault("sessions", {})
+    now = int(time.time())
+    for key, session in list(sessions.items()):
+        if int(session.get("expires", 0)) <= now:
+            sessions.pop(key, None)
+    sessions[_token_id(token)] = {
+        "email": email.strip().lower(),
+        "expires": now + SESSION_TTL,
+    }
     return token
 
 
-def valid_session(token: str | None) -> bool:
-    if not token or token not in _sessions:
+def valid_session(data: dict, token: str | None) -> bool:
+    if not token:
         return False
-    if _sessions[token] < time.time():
-        _sessions.pop(token, None)
+    session = data.get("sessions", {}).get(_token_id(token))
+    if not session or int(session.get("expires", 0)) <= time.time():
         return False
     return True
 
 
-def end_session(token: str | None) -> None:
+def end_session(data: dict, token: str | None) -> None:
     if token:
-        _sessions.pop(token, None)
+        data.setdefault("sessions", {}).pop(_token_id(token), None)

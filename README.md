@@ -16,7 +16,7 @@ No terminal, dentro desta pasta:
 python backend/app.py
 ```
 
-O navegador abrirá em `http://127.0.0.1:8000`. No primeiro acesso, cadastre o e-mail e a senha do responsável.
+O navegador abrirá em `http://127.0.0.1:8000`. Cada responsável pode usar **Criar conta** com seu próprio e-mail e senha. A sessão permanece ativa no aparelho por até 90 dias, inclusive quando o servidor reinicia.
 
 Para executar somente no computador, não é necessário instalar pacotes. Na nuvem, o Render instala automaticamente o conector PostgreSQL listado em `requirements.txt`.
 

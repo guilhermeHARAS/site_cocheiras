@@ -17,7 +17,7 @@ from pathlib import Path
 from threading import Timer
 from urllib.parse import unquote, urlparse
 
-from auth import create_session, end_session, new_password_record, valid_session, verify
+from auth import SESSION_TTL, create_session, end_session, new_password_record, valid_session, verify
 from storage import load, update
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -59,7 +59,7 @@ class Handler(BaseHTTPRequestHandler):
         return item.value if item else None
 
     def _authorized(self):
-        return valid_session(self._token())
+        return valid_session(load(), self._token())
 
     def _require_auth(self):
         if self._authorized():
@@ -68,18 +68,19 @@ class Handler(BaseHTTPRequestHandler):
         return False
 
     def _session_cookie(self, token, delete=False):
-        max_age = 0 if delete else 43_200
+        max_age = 0 if delete else SESSION_TTL
         value = "" if delete else token
-        return f"{COOKIE_NAME}={value}; Path=/; HttpOnly; SameSite=Strict; Max-Age={max_age}"
+        secure = "; Secure" if self.headers.get("X-Forwarded-Proto", "").split(",")[0].strip() == "https" else ""
+        return f"{COOKIE_NAME}={value}; Path=/; HttpOnly; SameSite=Lax; Max-Age={max_age}{secure}"
 
     def do_GET(self):
         path = urlparse(self.path).path
         if path == "/api/session":
             data = load()
             return self._json({
-                "setupRequired": data["account"] is None,
-                "authenticated": self._authorized(),
-                "email": data["account"].get("email") if data["account"] else None,
+                "setupRequired": not data["accounts"],
+                "authenticated": valid_session(data, self._token()),
+                "email": data["accounts"][0].get("email") if len(data["accounts"]) == 1 else None,
             })
         if path == "/api/horses":
             if self._require_auth():
@@ -94,13 +95,13 @@ class Handler(BaseHTTPRequestHandler):
         except ValueError as exc:
             return self._json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
 
-        if path == "/api/setup":
-            return self._setup(payload)
+        if path in ("/api/setup", "/api/signup"):
+            return self._signup(payload)
         if path == "/api/login":
             return self._login(payload)
         if path == "/api/logout":
             token = self._token()
-            end_session(token)
+            update(lambda data: end_session(data, token))
             return self._json({"ok": True}, cookie=self._session_cookie("", True))
         if not self._require_auth():
             return
@@ -156,29 +157,31 @@ class Handler(BaseHTTPRequestHandler):
         else:
             self._json({"error": "Cavalo não encontrado."}, HTTPStatus.NOT_FOUND)
 
-    def _setup(self, payload):
+    def _signup(self, payload):
         email = str(payload.get("email", "")).strip().lower()
         password = str(payload.get("password", ""))
         if not EMAIL_RE.match(email) or len(password) < 6:
             return self._json({"error": "Informe um e-mail válido e uma senha com 6 caracteres ou mais."}, HTTPStatus.BAD_REQUEST)
 
         def mutate(data):
-            if data["account"] is not None:
-                raise PermissionError
-            data["account"] = new_password_record(email, password)
+            if any(account.get("email") == email for account in data["accounts"]):
+                raise FileExistsError
+            data["accounts"].append(new_password_record(email, password))
+            return create_session(data, email)
 
         try:
-            update(mutate)
-        except PermissionError:
-            return self._json({"error": "O acesso já foi configurado."}, HTTPStatus.CONFLICT)
-        token = create_session()
+            token = update(mutate)
+        except FileExistsError:
+            return self._json({"error": "Já existe uma conta com este e-mail."}, HTTPStatus.CONFLICT)
         self._json({"ok": True, "email": email}, HTTPStatus.CREATED, self._session_cookie(token))
 
     def _login(self, payload):
-        account = load()["account"]
+        data = load()
+        email = str(payload.get("email", "")).strip().lower()
+        account = next((item for item in data["accounts"] if item.get("email") == email), None)
         if not verify(account, str(payload.get("email", "")), str(payload.get("password", ""))):
             return self._json({"error": "E-mail ou senha incorretos."}, HTTPStatus.UNAUTHORIZED)
-        token = create_session()
+        token = update(lambda current: create_session(current, account["email"]))
         self._json({"ok": True, "email": account["email"]}, cookie=self._session_cookie(token))
 
     def _validated_horse(self, payload, horse_id=None):
@@ -251,7 +254,8 @@ class Handler(BaseHTTPRequestHandler):
 
 def main():
     parser = argparse.ArgumentParser(description="Cocheira RADAMÉS")
-    parser.add_argument("--host", default=os.environ.get("HOST", "127.0.0.1"))
+    default_host = "0.0.0.0" if os.environ.get("PORT") else "127.0.0.1"
+    parser.add_argument("--host", default=os.environ.get("HOST", default_host))
     parser.add_argument("--port", type=int, default=int(os.environ.get("PORT", "8000")))
     parser.add_argument("--no-browser", action="store_true")
     args = parser.parse_args()

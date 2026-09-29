@@ -11,7 +11,19 @@ DATA_DIR = Path(__file__).resolve().parent / "data"
 STORE_FILE = DATA_DIR / "store.json"
 DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
 _lock = threading.RLock()
-_empty = {"account": None, "horses": []}
+
+
+def _empty_state() -> dict[str, Any]:
+    return {"accounts": [], "sessions": {}, "horses": []}
+
+
+def _normalize(data: dict[str, Any]) -> dict[str, Any]:
+    # Migra automaticamente a conta única usada pelas versões anteriores.
+    legacy_account = data.pop("account", None)
+    data.setdefault("accounts", [legacy_account] if legacy_account else [])
+    data.setdefault("sessions", {})
+    data.setdefault("horses", [])
+    return data
 
 if DATABASE_URL:
     try:
@@ -24,7 +36,7 @@ if DATABASE_URL:
 def _ensure() -> None:
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     if not STORE_FILE.exists():
-        save(dict(_empty))
+        save(_empty_state())
 
 
 def load() -> dict[str, Any]:
@@ -32,16 +44,14 @@ def load() -> dict[str, Any]:
         with psycopg.connect(DATABASE_URL, connect_timeout=10, sslmode="require") as connection:
             _ensure_database(connection)
             row = connection.execute("SELECT data FROM app_state WHERE id = 1").fetchone()
-            return row[0] if row else dict(_empty)
+            return _normalize(row[0] if row else _empty_state())
     with _lock:
         _ensure()
         try:
             data = json.loads(STORE_FILE.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
-            data = dict(_empty)
-        data.setdefault("account", None)
-        data.setdefault("horses", [])
-        return data
+            data = _empty_state()
+        return _normalize(data)
 
 
 def save(data: dict[str, Any]) -> None:
@@ -64,7 +74,7 @@ def update(mutator):
         with psycopg.connect(DATABASE_URL, connect_timeout=10, sslmode="require") as connection:
             _ensure_database(connection)
             row = connection.execute("SELECT data FROM app_state WHERE id = 1 FOR UPDATE").fetchone()
-            data = row[0] if row else dict(_empty)
+            data = _normalize(row[0] if row else _empty_state())
             result = mutator(data)
             connection.execute("UPDATE app_state SET data = %s WHERE id = 1", (Jsonb(data),))
             return result
@@ -84,5 +94,5 @@ def _ensure_database(connection) -> None:
     """)
     connection.execute(
         "INSERT INTO app_state (id, data) VALUES (1, %s) ON CONFLICT (id) DO NOTHING",
-        (Jsonb(_empty),),
+        (Jsonb(_empty_state()),),
     )

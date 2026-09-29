@@ -1,9 +1,14 @@
 async function request(path, options = {}) {
-  const response = await fetch(path, {
-    credentials: 'same-origin',
-    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
-    ...options,
-  });
+  let response;
+  try {
+    response = await fetch(path, {
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+      ...options,
+    });
+  } catch {
+    throw new Error('Não foi possível conectar ao servidor. Verifique sua internet e tente novamente.');
+  }
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
     const error = new Error(data.error || 'Não foi possível concluir a operação.');
@@ -15,7 +20,7 @@ async function request(path, options = {}) {
 
 export const api = {
   session: () => request('/api/session'),
-  setup: (email, password) => request('/api/setup', { method: 'POST', body: JSON.stringify({ email, password }) }),
+  signup: (email, password) => request('/api/signup', { method: 'POST', body: JSON.stringify({ email, password }) }),
   login: (email, password) => request('/api/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
   logout: () => request('/api/logout', { method: 'POST', body: '{}' }),
   horses: () => request('/api/horses'),

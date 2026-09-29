@@ -2,7 +2,7 @@ import { api } from './api.js';
 
 const GOAL = 60;
 const $ = selector => document.querySelector(selector);
-const state = { horses: [], filter: 'all', query: '', editing: null, pending: null, setupRequired: false };
+const state = { horses: [], filter: 'all', query: '', editing: null, pending: null, setupRequired: false, authMode: 'login', accountEmail: '' };
 let installPrompt = null;
 const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 const formatDate = value => value ? new Intl.DateTimeFormat('pt-BR', { timeZone: 'UTC' }).format(new Date(`${value}T12:00:00Z`)) : 'Nenhum treino registrado';
@@ -17,15 +17,24 @@ function toast(message, error = false) {
 
 function showAuth(session) {
   state.setupRequired = session.setupRequired;
+  state.accountEmail = session.email || '';
+  state.authMode = session.setupRequired ? 'signup' : 'login';
   $('#app').hidden = true;
   $('#auth').hidden = false;
-  $('#authTitle').textContent = session.setupRequired ? 'Crie seu acesso' : 'Bem-vindo de volta';
-  $('#authCopy').textContent = session.setupRequired ? 'Cadastre o acesso do responsável pela cocheira.' : 'Entre para acessar o controle da cocheira.';
-  $('#authButton').textContent = session.setupRequired ? 'Criar acesso' : 'Entrar';
-  $('#authNote').textContent = session.setupRequired ? 'A senha é protegida e armazenada somente neste computador.' : 'Ambiente reservado à equipe da Cocheira RADAMÉS.';
-  $('#authEmail').value = session.email || '';
+  $('#authEmail').value = state.accountEmail;
   $('#authPassword').value = '';
   $('#authError').textContent = '';
+  renderAuthMode();
+}
+
+function renderAuthMode() {
+  const signup = state.authMode === 'signup';
+  $('#authTitle').textContent = signup ? 'Criar conta' : 'Bem-vindo de volta';
+  $('#authCopy').textContent = signup ? 'Cadastre o e-mail e a senha de quem vai acessar a cocheira.' : 'Entre para acessar o controle da cocheira.';
+  $('#authButton').textContent = signup ? 'Criar conta' : 'Entrar';
+  $('#authSwitch').textContent = signup ? 'Já tem conta? Entrar' : 'Não tem conta? Criar conta';
+  $('#authNote').textContent = signup ? 'Sua conta ficará conectada neste aparelho por até 90 dias.' : 'Você continuará conectado neste aparelho.';
+  $('#authPassword').autocomplete = signup ? 'new-password' : 'current-password';
 }
 
 async function showApp() {
@@ -156,15 +165,23 @@ $('#authForm').addEventListener('submit', async event => {
   button.disabled = true;
   button.textContent = 'Aguarde…';
   try {
-    state.setupRequired ? await api.setup(email, password) : await api.login(email, password);
+    const signup = state.authMode === 'signup';
+    signup ? await api.signup(email, password) : await api.login(email, password);
     await showApp();
-    toast(state.setupRequired ? 'Acesso criado com sucesso.' : 'Login realizado com sucesso.');
+    toast(signup ? 'Conta criada com sucesso.' : 'Login realizado com sucesso.');
   } catch (error) {
     $('#authError').textContent = error.message;
   } finally {
     button.disabled = false;
-    button.textContent = state.setupRequired ? 'Criar acesso' : 'Entrar';
+    button.textContent = state.authMode === 'signup' ? 'Criar conta' : 'Entrar';
   }
+});
+
+$('#authSwitch').addEventListener('click', () => {
+  state.authMode = state.authMode === 'login' ? 'signup' : 'login';
+  $('#authError').textContent = '';
+  $('#authPassword').value = '';
+  renderAuthMode();
 });
 
 $('#logout').addEventListener('click', async () => { await api.logout(); showAuth(await api.session()); });
