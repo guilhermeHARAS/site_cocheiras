@@ -1,12 +1,31 @@
 # Cocheira RADAMÉS
 
-Sistema local para cadastro de cavalos e controle de treinos, organizado em frontend e backend.
+Sistema de acompanhamento da jornada dos cavalos: Cruzas, Potros, Em treinamento e Tropa pronta.
 
 ## Estrutura
 
 - `frontend/`: HTML, estilos, JavaScript, ícones e PWA.
-- `backend/`: servidor HTTP, API, autenticação e persistência.
+- `backend/`: servidor HTTP, API, autenticação, regras das etapas, assistente de consultas e persistência.
 - `backend/data/`: banco de dados JSON criado automaticamente no primeiro uso.
+
+## Dados antigos
+
+Ao carregar um banco do primeiro protótipo, a migração mantém contas, senhas protegidas, sessões, IDs, fotos, campos dos cavalos e contagens de treinos. Cavalos antigos sem etapa são classificados em `Em treinamento`; aqueles com 60 treinos ou mais não são movidos automaticamente. A migração é idempotente e não inventa data de nascimento para idades aproximadas.
+
+Antes de cada migração de formato, o servidor salva automaticamente uma cópia integral do estado bruto na tabela `app_state_backups`. O backup e a atualização da linha `app_state.id = 1` acontecem na mesma transação PostgreSQL, e o hash do conteúdo impede cópias duplicadas quando o servidor reinicia.
+
+## Pergunte à Cocheira
+
+O assistente local responde, em modo somente leitura, perguntas sobre filiação, etapas, idades, treinos e nascimentos previstos. Ele não depende de serviço externo, não envia os dados do clube a terceiros e não pode alterar cadastros.
+
+Exemplos:
+
+- `Quais são os filhos do Trovão?`
+- `Quantos filhos Trovão tem?` — se necessário, o assistente pergunta se deve procurar como pai, mãe ou nos dois campos.
+- `Quais filhos do pai Trovão estão em treinamento?`
+- `Quantos cavalos estão em treinamento?`
+- `Quem já atingiu 60 treinos?`
+- `Qual a idade de Aurora?`
 
 ## Executar
 
@@ -18,7 +37,14 @@ python backend/app.py
 
 O navegador abrirá em `http://127.0.0.1:8000`. Ao iniciar pelo `iniciar.bat`, a janela também mostra o endereço que deve ser aberto em celulares conectados ao mesmo Wi-Fi. Cada responsável pode usar **Criar conta** com seu próprio e-mail e senha. A sessão permanece ativa no aparelho por até 90 dias, inclusive quando o servidor reinicia.
 
-Para executar somente no computador, não é necessário instalar pacotes. Na nuvem, o Render instala automaticamente o conector PostgreSQL listado em `requirements.txt`.
+Para habilitar o banco PostgreSQL e a leitura de Excel no computador, instale os pacotes com `pip install -r requirements.txt`. Na nuvem, o Render faz essa instalação automaticamente.
+
+## Testes
+
+```powershell
+py -m unittest discover -s tests -p "test_*.py" -v
+node tests\test_frontend.mjs
+```
 
 ## Publicação gratuita
 
@@ -31,3 +57,15 @@ O projeto inclui `render.yaml` para publicar o servidor gratuitamente no Render 
 5. Quando solicitado, informe somente a senha do banco do Supabase na variável secreta `DATABASE_PASSWORD`.
 
 Não coloque a conexão do banco dentro do código ou do GitHub.
+## Cadastro rápido
+
+Em cada etapa, o botão **Cadastro rápido** permite:
+
+- importar planilhas Excel (`.xlsx`) ou CSV com reconhecimento de nomes alternativos de colunas;
+- ditar os dados pelo microfone em navegadores compatíveis;
+- fotografar documentos e extrair o texto para conferência;
+- colar anotações ou abrir arquivos `.txt` do Bloco de Notas.
+
+Toda entrada passa por uma prévia editável. É possível cadastrar um animal somente com o nome; nascimento e idade são solicitados, mas opcionais. Listas simples com uma linha por animal, contendo apenas `Nome` ou `Nome - idade`, também são reconhecidas. Nomes já existentes no banco ou repetidos na própria importação são destacados para o usuário e nenhum dado é gravado antes da confirmação. Se a planilha tiver uma coluna `Etapa`, ela pode distribuir os registros entre Cruzas, Potros, Em treinamento e Tropa pronta; sem essa coluna, é usada a etapa atualmente aberta.
+
+Em textos e documentos sem rótulos, linhas consecutivas com filiação, idade ou data completam o animal iniciado na primeira linha; uma linha em branco começa outro animal. Exemplo: `Persa`, `Duelo x Leide`, `3 anos`, linha em branco, `Estrela`. Em planilhas, linhas sem nome podem completar o último cavalo nomeado, e a prévia informa quais linhas foram reunidas. Interpretações ambíguas, como `Persa Duelo x Leide`, ficam desmarcadas e exigem conferência.

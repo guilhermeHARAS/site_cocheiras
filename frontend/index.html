@@ -11,16 +11,34 @@
   <link rel="icon" href="/horse.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css?v=71">
 </head>
 <body>
+  <svg class="ui-icon-sprite" aria-hidden="true">
+    <symbol id="ui-icon-sparkles" viewBox="0 0 24 24"><path d="m12 3 1.5 4.2L18 9l-4.5 1.8L12 15l-1.5-4.2L6 9l4.5-1.8L12 3Z"></path><path d="m19 15 .8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z"></path></symbol>
+    <symbol id="ui-icon-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></symbol>
+    <symbol id="ui-icon-minus" viewBox="0 0 24 24"><path d="M5 12h14"></path></symbol>
+    <symbol id="ui-icon-spreadsheet" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M3 9h18M9 4v16M15 9v11M9 14h12"></path></symbol>
+    <symbol id="ui-icon-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"></path><circle cx="4.5" cy="6" r="1"></circle><circle cx="4.5" cy="12" r="1"></circle><circle cx="4.5" cy="18" r="1"></circle></symbol>
+    <symbol id="ui-icon-microphone" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"></path></symbol>
+    <symbol id="ui-icon-document" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"></path><path d="M14 3v5h5M9 12h6M9 16h6"></path></symbol>
+    <symbol id="ui-icon-arrow-left" viewBox="0 0 24 24"><path d="m14 6-6 6 6 6M8 12h11"></path></symbol>
+    <symbol id="ui-icon-chevron-right" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"></path></symbol>
+    <symbol id="ui-icon-repeat" viewBox="0 0 24 24"><path d="M17 2l4 4-4 4"></path><path d="M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4"></path><path d="M21 13v2a3 3 0 0 1-3 3H3"></path></symbol>
+    <symbol id="ui-icon-assistant" viewBox="0 0 24 24"><path d="M5 4h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-7l-5 4v-4H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"></path><path d="m12 7 .8 2.2L15 10l-2.2.8L12 13l-.8-2.2L9 10l2.2-.8L12 7Z"></path></symbol>
+    <symbol id="ui-icon-award" viewBox="0 0 24 24"><circle cx="12" cy="9" r="6"></circle><path d="m9 14-2 7 5-3 5 3-2-7M9 9l2 2 4-4"></path></symbol>
+    <symbol id="ui-icon-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M8 3v4M16 3v4M3 10h18"></path></symbol>
+    <symbol id="ui-icon-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3A1.7 1.7 0 0 0 10 3V2.8h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"></path></symbol>
+    <symbol id="ui-icon-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 20c.7-4 3-6 7-6s6.3 2 7 6"></path></symbol>
+    <symbol id="ui-icon-logout" viewBox="0 0 24 24"><path d="M10 5H5v14h5M14 8l4 4-4 4M8 12h10"></path></symbol>
+  </svg>
   <section class="auth" id="auth" aria-labelledby="authTitle">
     <div class="auth__panel">
       <div class="brand brand--dark"><span class="brand__mark">R</span><span>Cocheira <b>RADAMÉS</b></span></div>
       <p class="eyebrow">GESTÃO EQUESTRE</p>
       <h1 id="authTitle">Bem-vindo</h1>
-      <p class="auth__copy" id="authCopy">Entre para acessar o controle da cocheira.</p>
+      <p class="auth__copy" id="authCopy">Entre para acompanhar a cocheira.</p>
       <form class="auth__form" id="authForm" novalidate>
         <label class="field"><span>E-mail</span><input id="authEmail" type="email" autocomplete="username" placeholder="nome@exemplo.com" required></label>
         <label class="field"><span>Senha</span><input id="authPassword" type="password" autocomplete="current-password" minlength="6" placeholder="Mínimo de 6 caracteres" required></label>
@@ -35,64 +53,396 @@
   <div id="app" hidden>
     <header class="topbar">
       <div class="container topbar__inside">
-        <div class="brand"><span class="brand__mark">R</span><span>Cocheira <b>RADAMÉS</b></span></div>
-        <div class="topbar__actions"><button class="button button--install" id="installApp" type="button" hidden>Instalar</button><button class="button button--ghost" id="logout" type="button">Sair</button></div>
+        <button class="brand brand--button" id="homeButton" type="button"><span class="brand__mark">R</span><span>Cocheira <b>RADAMÉS</b></span></button>
+        <div class="topbar__actions">
+          <button class="button button--install" id="installApp" type="button" hidden>Instalar</button>
+          <div class="topbar-settings">
+            <div class="settings-popover" id="settingsMenu" hidden>
+              <span class="settings-popover__title">Configurações</span>
+              <button id="manageAppearance" type="button"><span class="settings-popover__aa" aria-hidden="true">Aa</span><span>Aparência</span></button>
+              <button id="manageAccount" type="button"><svg class="ui-icon" aria-hidden="true"><use href="#ui-icon-user"></use></svg><span>Conta</span></button>
+              <button id="logout" type="button"><svg class="ui-icon" aria-hidden="true"><use href="#ui-icon-logout"></use></svg><span>Sair</span></button>
+            </div>
+            <button class="settings-fab" id="openSettings" type="button" aria-label="Abrir configurações" aria-expanded="false" aria-controls="settingsMenu"><svg class="ui-icon" aria-hidden="true"><use href="#ui-icon-settings"></use></svg></button>
+          </div>
+        </div>
       </div>
     </header>
 
     <main class="container dashboard">
-      <section class="intro">
-        <div><p class="eyebrow">PAINEL DA COCHEIRA</p><h1>Controle de treinos</h1><p>Acompanhe a evolução de cada cavalo até a meta de 60 treinos.</p></div>
-        <button class="button button--gold" id="addHorse" type="button"><span>＋</span> Novo cavalo</button>
-      </section>
-
-      <section class="metrics" aria-label="Resumo">
-        <article><span class="metric__icon">♞</span><div><strong id="total">0</strong><small>Cavalos cadastrados</small></div></article>
-        <article><span class="metric__icon">★</span><div><strong id="goals">0</strong><small>Metas alcançadas</small></div></article>
-      </section>
-
-      <section class="toolbar">
-        <label class="search"><span>⌕</span><input id="search" type="search" placeholder="Buscar cavalo" aria-label="Buscar cavalo"></label>
-        <div class="filters" role="group" aria-label="Filtros">
-          <button class="filter is-active" data-filter="all">Todos</button>
-          <button class="filter" data-filter="training">Em treino</button>
-          <button class="filter" data-filter="goal">Concluídos</button>
+      <section id="homeView">
+      <section class="intro intro--home">
+        <div>
+          <p class="eyebrow">LINHA DE VIDA E PREPARAÇÃO</p>
+          <h1>Gestão da Cocheira</h1>
+          <p>Escolha uma etapa para consultar e administrar os animais.</p>
         </div>
       </section>
 
-      <section class="horse-grid" id="horseGrid" aria-live="polite"></section>
+      <nav class="stage-menu" id="stageTimeline" aria-label="Etapas dos cavalos">
+        <button class="stage-card" data-stage="creation" type="button">
+          <span class="stage-card__step">01</span><span class="stage-card__icon" aria-hidden="true"><img src="/icons/cruzas-microscopio.png" alt=""></span>
+          <span class="stage-card__name">Reprodução</span><span class="stage-card__hint">Cruzas e previsões de nascimento</span><span class="stage-card__quantity"><span>Quantidade</span><strong id="count-creation">0</strong></span>
+        </button>
+        <button class="stage-card" data-stage="foals" type="button">
+          <span class="stage-card__step">02</span><span class="stage-card__icon" aria-hidden="true"><img src="/icons/potros-tropa-final-contorno-principal-2x.png?v=v4" alt=""></span>
+          <span class="stage-card__name">Potros e Desenvolvimento</span><span class="stage-card__hint">Animais em fase de crescimento</span><span class="stage-card__quantity"><span>Quantidade</span><strong id="count-foals">0</strong></span>
+        </button>
+        <button class="stage-card" data-stage="training" type="button">
+          <span class="stage-card__step">03</span><span class="stage-card__icon" aria-hidden="true"><img src="/icons/cavalo.png?v=v11-base-v6" alt=""></span>
+          <span class="stage-card__name">Preparação e Treinamento</span><span class="stage-card__hint">Controle dos treinos</span><span class="stage-card__quantity"><span>Quantidade</span><strong id="count-training">0</strong></span>
+        </button>
+        <button class="stage-card" data-stage="ready" type="button">
+          <span class="stage-card__step">04</span><span class="stage-card__icon" aria-hidden="true"><img src="/icons/polo-sem-dobras-camisa.png?v=v4" alt=""></span>
+          <span class="stage-card__name">Tropa pronta</span><span class="stage-card__hint">Cavalos prontos para torneio</span><span class="stage-card__quantity"><span>Quantidade</span><strong id="count-ready">0</strong></span>
+        </button>
+      </nav>
+      <button class="finance-entry" id="openCosts" type="button">
+        <span class="finance-entry__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 19V9m6 10V5m6 14v-7m4 7H2"></path><path d="m4 7 6-4 6 7 4-3"></path></svg></span>
+        <span><strong>Custos e análises</strong><small>Acompanhe o custo bruto da cocheira</small></span>
+        <span class="finance-entry__action">Abrir financeiro <b>→</b></span>
+      </button>
+      </section>
+
+      <section id="stageView" hidden>
+        <button class="back-button" id="backHome" type="button"><svg class="ui-icon" aria-hidden="true"><use href="#ui-icon-arrow-left"></use></svg>Voltar para as etapas</button>
+        <section class="intro intro--stage">
+          <div>
+          <p class="stage-toolbar__overline" id="stageOverline">ETAPA 1 DE 4</p>
+          <h1 id="stageTitle">Reprodução</h1>
+          <p id="stageDescription">Cruzas e previsões de nascimento.</p>
+          </div>
+          <div class="intro__actions">
+            <button class="button button--soft" id="openQuickCapture" type="button"><svg class="ui-icon" aria-hidden="true"><use href="#ui-icon-sparkles"></use></svg>Cadastro rápido</button>
+            <button class="button button--gold" id="addHorse" type="button"><svg class="ui-icon" aria-hidden="true"><use href="#ui-icon-plus"></use></svg><span id="addHorseLabel">Novo registro</span></button>
+          </div>
+        </section>
+
+        <section class="stage-toolbar stage-toolbar--search">
+          <label class="search"><span>⌕</span><input id="search" type="search" placeholder="Buscar registro" aria-label="Buscar registro"></label>
+        </section>
+
+        <section class="horse-grid" id="horseGrid" aria-live="polite"></section>
+      </section>
+
+      <section id="costsView" class="costs-simple" hidden>
+        <button class="back-button" id="backFromCosts" type="button"><svg class="ui-icon" aria-hidden="true"><use href="#ui-icon-arrow-left"></use></svg>Voltar para as etapas</button>
+        <div class="costs-simple__sheet">
+          <header class="costs-simple__head">
+            <div><p class="eyebrow">FINANCEIRO</p><h1>Custos e análises</h1><p>Custo bruto da cocheira, sem complicação.</p></div>
+            <div class="cost-period">
+              <button class="icon-button" id="previousCostMonth" type="button" aria-label="Mês anterior">‹</button>
+              <label><span>Mês</span><input id="costMonth" type="month"></label>
+              <button class="icon-button" id="nextCostMonth" type="button" aria-label="Próximo mês">›</button>
+            </div>
+          </header>
+
+          <section class="cost-metrics" aria-label="Resumo dos custos">
+            <article><strong id="costTotal">R$ 0,00</strong><span>Total do mês</span><small id="costComparison">Sem comparação anterior</small></article>
+            <article><strong id="costPerHorse">R$ 0,00</strong><span>Custo médio por cavalo</span><small id="costHorseCount">0 cavalos considerados</small></article>
+          </section>
+
+          <div class="costs-simple__actions">
+            <button class="button button--gold" id="addExpense" type="button"><svg class="ui-icon" aria-hidden="true"><use href="#ui-icon-plus"></use></svg>Adicionar despesa</button>
+            <button class="button button--soft" id="smartExpense" type="button"><svg class="ui-icon" aria-hidden="true"><use href="#ui-icon-sparkles"></use></svg>Escrever do meu jeito</button>
+            <button class="button button--soft" id="importExpenses" type="button"><svg class="ui-icon" aria-hidden="true"><use href="#ui-icon-spreadsheet"></use></svg>Importar lista</button>
+          </div>
+
+          <section class="costs-simple__block">
+            <div class="costs-simple__title"><h2>Distribuição dos custos</h2><span>Todos os gastos no mesmo gráfico</span></div>
+            <div class="category-chart" id="costCategoryChart" aria-label="Gráfico consolidado dos custos"></div>
+          </section>
+
+          <section class="costs-simple__block">
+            <div class="costs-simple__title"><h2>Despesas recentes</h2><span id="costEntriesCount">0 lançamentos</span></div>
+            <div class="cost-list" id="costList" aria-live="polite"></div>
+          </section>
+        </div>
+      </section>
     </main>
+
+    <div class="floating-tools" id="floatingTools">
+      <button class="assistant-fab" id="openAssistant" type="button" aria-label="Abrir Agente de IA"><svg class="ui-icon" aria-hidden="true"><use href="#ui-icon-assistant"></use></svg><span class="assistant-fab__label">Agente de IA</span></button>
+    </div>
   </div>
 
-  <dialog class="modal" id="horseModal">
-    <div class="modal__head"><div><p class="eyebrow">CADASTRO</p><h2 id="modalTitle">Novo cavalo</h2></div><button class="icon-button modal-close" type="button" aria-label="Fechar">×</button></div>
-    <form id="horseForm" class="modal__form" novalidate>
-      <div class="notice" id="duplicateNotice" hidden></div>
+  <dialog class="assistant" id="assistantModal">
+    <div class="assistant__head">
+      <div><p class="eyebrow">ASSISTENTE DE CONSULTA</p><h2>Agente de IA</h2></div>
+      <button class="icon-button" id="closeAssistant" type="button" aria-label="Fechar">×</button>
+    </div>
+    <div class="assistant__messages" id="assistantMessages" aria-live="polite">
+      <div class="assistant-message assistant-message--bot"><small class="assistant-message__label"><svg class="ui-icon" aria-hidden="true"><use href="#ui-icon-assistant"></use></svg>AGENTE DE IA</small><span class="assistant-message__text">Olá! Posso consultar cavalos, filiação, etapas, idades, treinos, nascimentos e analisar todos os custos da cocheira. Não altero nenhum cadastro.</span></div>
+    </div>
+    <div class="assistant__examples" aria-label="Perguntas rápidas por área">
+      <button class="is-priority" type="button" data-question="Quais custos aumentaram muito este mês?"><small>ALERTA</small>Custos que aumentaram</button>
+      <button class="is-priority" type="button" data-question="Faça uma auditoria completa dos dados"><small>AUDITORIA</small>Revisar possíveis problemas</button>
+      <button class="is-priority" type="button" data-question="Existe alguma despesa fora do normal este mês?"><small>ALERTA</small>Despesas fora do padrão</button>
+      <button class="is-priority" type="button" data-question="Quanto vamos gastar no próximo mês?"><small>PREVISÃO</small>Estimar o próximo mês</button>
+      <button type="button" data-question="Crie um relatório financeiro deste mês"><small>RELATÓRIO</small>Baixar resumo do mês</button>
+      <button type="button" data-question="Qual é o custo médio por cavalo este mês?"><small>CUSTOS</small>Média por cavalo</button>
+      <button type="button" data-question="Quem já atingiu 60 treinos?"><small>TREINOS</small>Meta de 60 treinos</button>
+      <button type="button" data-question="Quais nascimentos estão previstos neste mês?"><small>NASCIMENTOS</small>Previsões do mês</button>
+      <button type="button" data-question="Quantos filhos Trovão tem?"><small>FILIAÇÃO</small>Filhos de um cavalo</button>
+      <button type="button" data-question="Quantos cavalos existem em cada etapa?"><small>ETAPAS</small>Quantidade por etapa</button>
+    </div>
+    <form class="assistant__form" id="assistantForm">
+      <label class="sr-only" for="assistantQuestion">Pergunta sobre a cocheira</label>
+      <input id="assistantQuestion" maxlength="500" autocomplete="off" placeholder="Ex.: Quais são os filhos do Trovão?" required>
+      <button class="assistant__voice" id="assistantVoice" type="button" aria-label="Fazer pergunta por voz" title="Fazer pergunta por voz"><svg class="ui-icon" aria-hidden="true"><use href="#ui-icon-microphone"></use></svg></button>
+      <button class="button button--primary" id="assistantSend" type="submit">Enviar</button>
+    </form>
+    <p class="assistant__privacy">Consulta somente os dados da Cocheira RADAMÉS e não realiza alterações.</p>
+  </dialog>
+
+  <dialog class="modal horse-details" id="horseDetailsModal">
+    <div class="modal__head">
+      <div><p class="eyebrow" id="detailEyebrow">FICHA DO ANIMAL</p><h2 id="detailName">Cavalo</h2></div>
+      <button class="icon-button detail-close" type="button" aria-label="Fechar">×</button>
+    </div>
+    <div class="horse-details__body" id="horseDetailsBody"></div>
+    <div class="horse-details__actions">
+      <button class="button button--soft detail-close" type="button">Fechar</button>
+      <button class="button button--primary" id="detailEdit" type="button">Editar cadastro</button>
+    </div>
+  </dialog>
+
+  <dialog class="modal expense-modal" id="expenseModal">
+    <div class="modal__head"><div><p class="eyebrow">CUSTOS</p><h2 id="expenseModalTitle">Adicionar despesa</h2></div><button class="icon-button expense-close" type="button" aria-label="Fechar">×</button></div>
+    <form class="modal__form" id="expenseForm" novalidate>
       <div class="form-grid">
-        <label class="field field--full"><span>Nome do cavalo *</span><input id="name" maxlength="80" required></label>
-        <label class="field field--full"><span>Foto (opcional, até 2,5 MB)</span><input id="photo" type="file" accept="image/*"></label>
-        <div class="photo-preview field--full" id="photoPreview"></div>
-        <label class="field"><span>Raça</span><input id="breed" maxlength="80"></label>
-        <label class="field"><span>Idade</span><input id="age" type="number" min="0" max="60"></label>
-        <label class="field"><span>Sexo</span><select id="sex"><option value="">Não informado</option><option>Macho</option><option>Fêmea</option><option>Castrado</option></select></label>
-        <label class="field"><span>Proprietário</span><input id="owner" maxlength="100"></label>
-        <label class="field"><span>Pai</span><input id="father" maxlength="80" placeholder="Nome do pai"></label>
-        <label class="field"><span>Mãe</span><input id="mother" maxlength="80" placeholder="Nome da mãe"></label>
-        <label class="field"><span>Quantidade de treinos</span><input id="workouts" type="number" min="0" value="0"></label>
-        <label class="field field--full"><span>Observações</span><textarea id="notes" maxlength="600"></textarea></label>
+        <label class="field"><span>Valor *</span><input id="expenseAmount" inputmode="decimal" placeholder="0,00" required></label>
+        <label class="field"><span>Data *</span><input id="expenseDate" type="date" required></label>
+        <label class="field"><span>Categoria *</span><select id="expenseCategory"><option value="food">Alimentação</option><option value="veterinary">Veterinário</option><option value="farrier">Ferrageamento</option><option value="training">Treinamento</option><option value="transport">Transporte</option><option value="medicine">Medicamentos</option><option value="fees">Taxas</option><option value="other">Outros</option></select></label>
+        <label class="field field--full"><span>Descrição</span><textarea id="expenseDescription" maxlength="180" placeholder="Ex.: compra mensal de ração"></textarea></label>
+        <label class="recurring-toggle field--full"><input id="expenseRecurring" type="checkbox"><span class="recurring-toggle__icon" aria-hidden="true"><svg class="ui-icon"><use href="#ui-icon-repeat"></use></svg></span><span><strong>Despesa fixa mensal</strong><small>Repete este valor automaticamente nos próximos meses.</small></span></label>
+      </div>
+      <p class="form-error" id="expenseError" role="alert"></p>
+      <div class="modal__actions"><button class="button button--soft expense-close" type="button">Cancelar</button><button class="button button--primary" id="saveExpense" type="submit">Salvar despesa</button></div>
+    </form>
+  </dialog>
+
+  <dialog class="modal cost-import" id="costImportModal">
+    <div class="modal__head"><div><p class="eyebrow">IMPORTAÇÃO INTELIGENTE</p><h2>Adicionar vários custos</h2></div><button class="icon-button cost-import-close" type="button" aria-label="Fechar">×</button></div>
+    <div class="cost-import__body">
+      <div class="cost-import__methods">
+        <button class="cost-import-method is-active" data-cost-import-method="spreadsheet" type="button"><span><svg class="ui-icon" aria-hidden="true"><use href="#ui-icon-spreadsheet"></use></svg></span><strong>Planilha</strong><small>Excel ou CSV</small></button>
+        <button class="cost-import-method" data-cost-import-method="notes" type="button"><span><svg class="ui-icon" aria-hidden="true"><use href="#ui-icon-list"></use></svg></span><strong>Anotações</strong><small>Texto ou arquivo .txt</small></button>
+      </div>
+      <section class="cost-import-panel" data-cost-import-panel="spreadsheet">
+        <label class="upload-drop"><span>Escolha a planilha de custos</span><small>Reconhece descrição, valor, data, categoria e despesa recorrente.</small><input id="costSpreadsheetFile" type="file" accept=".xlsx,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv"></label>
+        <button class="button button--primary" id="analyzeCostSpreadsheet" type="button">Ler planilha</button>
+      </section>
+      <section class="cost-import-panel" data-cost-import-panel="notes" hidden>
+        <label class="field"><span>Anotações de custos</span><textarea id="costNotesText" rows="7" placeholder="Ração R$ 1.200 mensal&#10;Veterinário R$ 480 em 18/10/2026&#10;Frete 350 hoje"></textarea></label>
+        <label class="field capture-file"><span>Ou selecione um arquivo .txt</span><input id="costNotesFile" type="file" accept=".txt,text/plain"></label>
+        <button class="button button--primary" id="analyzeCostNotes" type="button">Organizar custos</button>
+      </section>
+      <p class="form-error" id="costImportError" role="alert"></p>
+      <section class="cost-import-review" id="costImportReview" hidden>
+        <div class="cost-import-review__head"><strong id="costImportSummary">0 despesas</strong><span>Confira antes de salvar</span></div>
+        <div class="cost-import-records" id="costImportRecords"></div>
+        <div class="modal__actions"><button class="button button--soft" id="backCostImport" type="button">Voltar</button><button class="button button--primary" id="confirmCostImport" type="button">Salvar selecionadas</button></div>
+      </section>
+    </div>
+  </dialog>
+
+  <dialog class="modal modal--small smart-expense" id="smartExpenseModal">
+    <div class="modal__head"><div><p class="eyebrow">LANÇAMENTO INTELIGENTE</p><h2>Conte o que foi gasto</h2></div><button class="icon-button smart-expense-close" type="button" aria-label="Fechar">×</button></div>
+    <form class="modal__form" id="smartExpenseForm">
+      <p class="smart-expense__hint">Exemplo: “Veterinário, R$ 480 ontem”. O sistema organizará os campos para sua conferência.</p>
+      <label class="field"><span>Descrição da despesa</span><textarea id="smartExpenseText" rows="5" required placeholder="Ração R$ 1.200 para a cocheira hoje"></textarea></label>
+      <p class="form-error" id="smartExpenseError" role="alert"></p>
+      <div class="modal__actions"><button class="button button--soft smart-expense-close" type="button">Cancelar</button><button class="button button--primary" id="interpretExpense" type="submit">Organizar lançamento</button></div>
+    </form>
+  </dialog>
+
+  <dialog class="modal" id="horseModal">
+    <div class="modal__head">
+      <div><p class="eyebrow" id="modalEyebrow">CADASTRO</p><h2 id="modalTitle">Novo registro</h2></div>
+      <button class="icon-button modal-close" type="button" aria-label="Fechar">×</button>
+    </div>
+    <form id="horseForm" class="modal__form" novalidate>
+      <input id="formStage" type="hidden">
+      <div class="completion-guide" id="completionGuide" hidden>
+        <strong>Complete as informações destacadas</strong>
+        <span id="completionGuideText"></span>
+      </div>
+      <div class="form-grid">
+        <label class="field field--full"><span id="nameLabel">Nome do cavalo *</span><input id="name" maxlength="80"></label>
+        <label class="field"><span>Nome do pai <b class="creation-required">*</b></span><input id="father" maxlength="80"></label>
+        <label class="field"><span>Nome da mãe <b class="creation-required">*</b></span><input id="mother" maxlength="80"></label>
+
+        <label class="field field--full only-creation"><span>Data prevista de nascimento *</span><input id="expectedBirthDate" type="date"></label>
+
+        <fieldset class="birth-fields field--full only-born">
+          <legend>Nascimento</legend>
+          <p>Informe a data exata ou a idade em anos, se souber. Este campo é opcional.</p>
+          <div class="form-grid">
+            <label class="field"><span>Data de nascimento</span><input id="birthDate" type="date"></label>
+            <label class="field"><span>Idade em anos</span><input id="age" type="number" min="0" max="60"></label>
+          </div>
+        </fieldset>
+
+        <label class="field field--full only-born"><span>Localização atual</span><input id="location" maxlength="120" placeholder="Ex.: Baia 7, piquete norte ou fazenda"></label>
+
+        <div class="form-grid field--full optional-details">
+          <label class="field"><span>Raça</span><input id="breed" maxlength="80"></label>
+          <label class="field"><span>Sexo</span><select id="sex"><option value="">Não informado</option><option>Macho</option><option>Fêmea</option><option>Castrado</option></select></label>
+          <label class="field field--full"><span>Proprietário</span><input id="owner" maxlength="100"></label>
+          <label class="field field--full"><span>Observações</span><textarea id="notes" maxlength="600"></textarea></label>
+        </div>
+
+        <label class="field field--full only-training"><span>Quantidade de treinos já realizados</span><input id="workouts" type="number" min="0" value="0"></label>
       </div>
       <p class="form-error" id="horseError" role="alert"></p>
-      <div class="modal__actions"><button class="button button--soft modal-close" type="button">Cancelar</button><button class="button button--primary" id="saveHorse">Salvar cavalo</button></div>
+      <div class="modal__actions">
+        <button class="button button--soft modal-close" type="button">Cancelar</button>
+        <button class="button button--primary" id="saveHorse">Salvar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="modal modal--small" id="bornModal">
+    <div class="modal__head"><div><p class="eyebrow">NASCIMENTO</p><h2>Confirmar nascimento</h2></div><button class="icon-button born-close" type="button" aria-label="Fechar">×</button></div>
+    <form id="bornForm" class="modal__form" novalidate>
+      <input id="bornHorseId" type="hidden">
+      <div class="form-grid">
+        <label class="field field--full"><span>Nome do cavalo</span><input id="bornName" maxlength="80" placeholder="Pode continuar a definir"></label>
+        <label class="field field--full"><span>Data real de nascimento *</span><input id="actualBirthDate" type="date" required></label>
+      </div>
+      <p class="form-error" id="bornError" role="alert"></p>
+      <div class="modal__actions"><button class="button button--soft born-close" type="button">Cancelar</button><button class="button button--primary" id="confirmBorn">Confirmar nascimento</button></div>
     </form>
   </dialog>
 
   <dialog class="modal modal--small" id="confirmModal">
     <div class="modal__head"><h2 id="confirmTitle">Confirmar</h2><button class="icon-button confirm-close" type="button" aria-label="Fechar">×</button></div>
-    <div class="confirm__body"><p id="confirmText"></p><div class="modal__actions"><button class="button button--soft confirm-close">Cancelar</button><button class="button button--danger" id="confirmYes">Confirmar</button></div></div>
+    <div class="confirm__body"><p id="confirmText"></p><div class="modal__actions"><button class="button button--soft confirm-close" id="confirmNo" type="button">Cancelar</button><button class="button button--danger" id="confirmYes" type="button">Confirmar</button></div></div>
+  </dialog>
+
+  <dialog class="modal quick-capture" id="quickCaptureModal">
+    <div class="modal__head">
+      <div><p class="eyebrow">ENTRADA ASSISTIDA</p><h2>Cadastro rápido</h2></div>
+      <button class="icon-button quick-close" type="button" aria-label="Fechar">×</button>
+    </div>
+    <div class="quick-capture__body">
+      <p class="quick-capture__intro">Escolha como deseja trazer os dados. Nada será salvo antes da sua conferência.</p>
+      <div class="capture-methods" role="tablist" aria-label="Formas de cadastro rápido">
+        <button class="capture-method is-active" data-capture="spreadsheet" type="button"><span><svg class="ui-icon" aria-hidden="true"><use href="#ui-icon-spreadsheet"></use></svg></span><strong>Planilha</strong><small>Excel ou CSV</small></button>
+        <button class="capture-method" data-capture="voice" type="button"><span><svg class="ui-icon" aria-hidden="true"><use href="#ui-icon-microphone"></use></svg></span><strong>Microfone</strong><small>Fale os dados</small></button>
+        <button class="capture-method" data-capture="document" type="button"><span><svg class="ui-icon" aria-hidden="true"><use href="#ui-icon-document"></use></svg></span><strong>Documento</strong><small>Fotografe e leia</small></button>
+        <button class="capture-method" data-capture="text" type="button"><span><svg class="ui-icon" aria-hidden="true"><use href="#ui-icon-list"></use></svg></span><strong>Anotações</strong><small>Cole ou envie .txt</small></button>
+      </div>
+
+      <section class="capture-panel" data-panel="spreadsheet">
+        <label class="upload-drop"><span>Selecione a planilha</span><small>Reconhece .xlsx e .csv, mesmo com nomes de colunas diferentes.</small><input id="spreadsheetFile" type="file" accept=".xlsx,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv"></label>
+        <p class="capture-tip">Exemplos reconhecidos: Cavalo/Animal/Nome, Pai/Garanhão, Mãe/Matriz, Nascimento, Idade, Etapa e Treinos.</p>
+        <button class="button button--primary" id="analyzeSpreadsheet" type="button">Ler planilha</button>
+      </section>
+
+      <section class="capture-panel" data-panel="voice" hidden>
+        <p class="capture-tip">Exemplo: “Nome Relâmpago; pai Trovão; mãe Estrela; idade 3 anos; 12 treinos”.</p>
+        <button class="button button--primary button--wide" id="startDictation" type="button"><svg class="ui-icon" aria-hidden="true"><use href="#ui-icon-microphone"></use></svg>Começar a falar</button>
+        <label class="field"><span>Texto reconhecido</span><textarea id="voiceText" rows="5" placeholder="O que você disser aparecerá aqui para conferência."></textarea></label>
+        <button class="button button--soft" id="analyzeVoice" type="button">Organizar dados falados</button>
+      </section>
+
+      <section class="capture-panel" data-panel="document" hidden>
+        <label class="upload-drop"><span>Fotografe ou escolha o documento</span><small>A leitura reconhece o texto da imagem; confira nomes e datas antes de salvar.</small><input id="documentPhoto" type="file" accept="image/*" capture="environment"></label>
+        <div class="document-preview" id="documentPreview"></div>
+        <p class="capture-progress" id="ocrProgress"></p>
+        <button class="button button--primary" id="analyzeDocument" type="button">Ler documento</button>
+      </section>
+
+      <section class="capture-panel" data-panel="text" hidden>
+        <label class="field"><span>Anotações do Bloco de Notas</span><textarea id="notesImportText" rows="7" placeholder="Persa&#10;Duelo x Leide&#10;3 anos&#10;&#10;Estrela&#10;Trovão x Lua"></textarea></label>
+        <p class="capture-tip">Linhas seguidas podem completar o mesmo cavalo. Deixe uma linha em branco para começar outro animal.</p>
+        <label class="field capture-file"><span>Ou selecione um arquivo .txt</span><input id="notesFile" type="file" accept=".txt,text/plain"></label>
+        <button class="button button--primary" id="analyzeNotes" type="button">Organizar anotações</button>
+      </section>
+
+      <p class="form-error" id="captureError" role="alert"></p>
+    </div>
+  </dialog>
+
+  <dialog class="modal import-review" id="importReviewModal">
+    <div class="modal__head">
+      <div><p class="eyebrow">CONFERÊNCIA OBRIGATÓRIA</p><h2>Revise antes de salvar</h2></div>
+      <button class="icon-button review-close" type="button" aria-label="Fechar">×</button>
+    </div>
+    <div class="import-review__body">
+      <div class="import-summary" id="importSummary"></div>
+      <div class="notice" id="importWarnings" hidden></div>
+      <div class="import-records" id="importRecords"></div>
+      <p class="form-error" id="importError" role="alert"></p>
+      <div class="modal__actions import-review__actions">
+        <button class="button button--soft review-close" type="button">Cancelar</button>
+        <button class="button button--primary" id="confirmImport" type="button">Salvar selecionados</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="modal account-manager" id="accountModal">
+    <div class="modal__head">
+      <div><p class="eyebrow">GERENCIAMENTO</p><h2>Conta da cocheira</h2></div>
+      <button class="icon-button account-close" type="button" aria-label="Fechar">×</button>
+    </div>
+    <div class="account-manager__body">
+      <section class="account-section">
+        <h3>E-mails com acesso</h3>
+        <p>Todos estes e-mails acessam os mesmos cavalos desta conta. Cada pessoa usa sua própria senha.</p>
+        <div class="account-emails" id="accountEmails"></div>
+      </section>
+
+      <form class="account-section" id="addEmailForm">
+        <h3>Adicionar outro e-mail</h3>
+        <div class="form-grid">
+          <label class="field"><span>Novo e-mail</span><input id="newAccessEmail" type="email" autocomplete="off" required></label>
+          <label class="field"><span>Senha para este e-mail</span><input id="newAccessPassword" type="password" minlength="6" autocomplete="new-password" required></label>
+        </div>
+        <p class="form-error" id="addEmailError" role="alert"></p>
+        <button class="button button--primary" type="submit">Adicionar acesso</button>
+      </form>
+
+      <form class="account-section" id="changePasswordForm">
+        <h3>Trocar minha senha</h3>
+        <p>Por segurança, a senha atual nunca é exibida. Você pode substituí-la usando os campos abaixo.</p>
+        <div class="form-grid">
+          <label class="field"><span>Senha atual</span><input id="currentPassword" type="password" autocomplete="current-password" required></label>
+          <label class="field"><span>Nova senha</span><input id="newPassword" type="password" minlength="6" autocomplete="new-password" required></label>
+        </div>
+        <p class="form-error" id="passwordError" role="alert"></p>
+        <button class="button button--primary" type="submit">Atualizar senha</button>
+      </form>
+    </div>
+  </dialog>
+
+  <dialog class="modal appearance-manager" id="appearanceModal">
+    <div class="modal__head">
+      <div><p class="eyebrow">PERSONALIZAÇÃO</p><h2>Aparência do sistema</h2></div>
+      <button class="icon-button appearance-close" type="button" aria-label="Fechar">×</button>
+    </div>
+    <div class="appearance-manager__body">
+      <section class="account-section appearance-settings">
+        <h3>Fonte e leitura</h3>
+        <p>Escolha uma combinação de fontes e o tamanho mais confortável. A preferência fica salva somente neste aparelho.</p>
+        <div class="form-grid">
+          <label class="field"><span>Estilo da fonte</span><select id="fontPreference">
+            <option value="professional">Profissional — Playfair + DM Sans</option>
+            <option value="classic">Clássica — Playfair Display</option>
+            <option value="modern">Moderna — DM Sans</option>
+          </select></label>
+          <label class="field font-size-control"><span>Tamanho da fonte <output id="fontSizeValue" for="fontSizePreference">100%</output></span><input id="fontSizePreference" type="range" min="85" max="125" step="5" value="100"></label>
+        </div>
+        <div class="font-size-scale" aria-hidden="true"><span>Menor</span><span>Padrão</span><span>Maior</span></div>
+        <div class="appearance-preview"><span>EXEMPLO</span><strong>60 treinos · 3 anos</strong><p>Informações claras e elegantes.</p></div>
+      </section>
+    </div>
   </dialog>
 
   <div class="toasts" id="toasts" aria-live="polite"></div>
   <div class="confetti" id="confetti"></div>
-  <script type="module" src="/app.js"></script>
+  <script type="module" src="/app.js?v=71"></script>
 </body>
 </html>

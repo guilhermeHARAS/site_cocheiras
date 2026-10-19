@@ -10,10 +10,12 @@ ITERATIONS = 240_000
 SESSION_TTL = 60 * 60 * 24 * 90
 
 
-def new_password_record(email: str, password: str) -> dict[str, str | int]:
+def new_password_record(email: str, password: str, *, workspace_id: str | None = None) -> dict[str, str | int]:
     salt = secrets.token_bytes(16)
     digest = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, ITERATIONS)
     return {
+        "id": secrets.token_hex(16),
+        "workspaceId": workspace_id or secrets.token_hex(16),
         "email": email.strip().lower(),
         "salt": salt.hex(),
         "password_hash": digest.hex(),
@@ -61,6 +63,16 @@ def valid_session(data: dict, token: str | None) -> bool:
     if not session or int(session.get("expires", 0)) <= time.time():
         return False
     return True
+
+
+def session_email(data: dict, token: str | None) -> str | None:
+    """Retorna o e-mail autenticado sem expor o token nem a senha."""
+    if not token:
+        return None
+    session = data.get("sessions", {}).get(_token_id(token))
+    if not session or int(session.get("expires", 0)) <= time.time():
+        return None
+    return str(session.get("email") or "").strip().lower() or None
 
 
 def end_session(data: dict, token: str | None) -> None:
