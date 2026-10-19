@@ -372,13 +372,17 @@ class Handler(BaseHTTPRequestHandler):
     def _signup(self, payload):
         email = str(payload.get("email", "")).strip().lower()
         password = str(payload.get("password", ""))
+        first_name = str(payload.get("firstName", "")).strip()[:60]
+        last_name = str(payload.get("lastName", "")).strip()[:60]
         if not EMAIL_RE.match(email) or len(password) < 6:
             return self._json({"error": "Informe um e-mail válido e uma senha com 6 caracteres ou mais."}, HTTPStatus.BAD_REQUEST)
+        if not first_name or not last_name:
+            return self._json({"error": "Informe nome e sobrenome para criar a conta."}, HTTPStatus.BAD_REQUEST)
 
         def mutate(data):
             if any(account.get("email") == email for account in data["accounts"]):
                 raise FileExistsError
-            data["accounts"].append(new_password_record(email, password))
+            data["accounts"].append(new_password_record(email, password, first_name=first_name, last_name=last_name))
             return create_session(data, email)
 
         try:
@@ -391,6 +395,8 @@ class Handler(BaseHTTPRequestHandler):
         data = load()
         email = str(payload.get("email", "")).strip().lower()
         account = next((item for item in data["accounts"] if item.get("email") == email), None)
+        if not account:
+            return self._json({"error": "Esta conta não existe. Use o botão Criar conta para se cadastrar."}, HTTPStatus.NOT_FOUND)
         if not verify(account, email, str(payload.get("password", ""))):
             return self._json({"error": "E-mail ou senha incorretos."}, HTTPStatus.UNAUTHORIZED)
         token = update(lambda current: create_session(current, account["email"]))

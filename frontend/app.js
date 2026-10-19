@@ -166,6 +166,8 @@ function showAuth(session) {
   $('#auth').hidden = false;
   $('#authEmail').value = state.accountEmail;
   $('#authPassword').value = '';
+  $('#authFirstName').value = '';
+  $('#authLastName').value = '';
   $('#authError').textContent = '';
   renderAuthMode();
 }
@@ -178,6 +180,10 @@ function renderAuthMode() {
   $('#authSwitch').textContent = signup ? 'Já tem conta? Entrar' : 'Não tem conta? Criar conta';
   $('#authNote').textContent = signup ? 'Sua conta ficará conectada neste aparelho por até 90 dias.' : 'Você continuará conectado neste aparelho.';
   $('#authPassword').autocomplete = signup ? 'new-password' : 'current-password';
+  $('#authFirstNameField').hidden = !signup;
+  $('#authLastNameField').hidden = !signup;
+  $('#authFirstName').required = signup;
+  $('#authLastName').required = signup;
 }
 
 async function showApp() {
@@ -292,8 +298,8 @@ async function loadAccount() {
 async function openAccountManager() {
   $('#addEmailError').textContent = '';
   $('#passwordError').textContent = '';
-  $('#addEmailForm').reset();
-  $('#changePasswordForm').reset();
+  $('#addEmailForm')?.reset();
+  $('#changePasswordForm')?.reset();
   try {
     await loadAccount();
     $('#accountModal').showModal();
@@ -506,7 +512,7 @@ function render() {
 function openExpenseForm(expense = null) {
   const editing = Boolean(expense?.id);
   state.editingExpense = editing ? expense.id : null;
-  $('#expenseForm').reset();
+  $('#expenseForm')?.reset();
   $('#expenseError').textContent = '';
   $('#expenseModalTitle').textContent = editing ? 'Editar despesa' : 'Adicionar despesa';
   $('#expenseAmount').value = expense ? (Number(expense.amountCents || 0) / 100).toFixed(2).replace('.', ',') : '';
@@ -588,7 +594,7 @@ async function previewCostImport(payload, button) {
 }
 
 function clearForm() {
-  $('#horseForm').reset();
+  $('#horseForm')?.reset();
   $('#workouts').value = 0;
   $('#horseError').textContent = '';
   $('#completionGuide').hidden = true;
@@ -674,15 +680,19 @@ $('#authForm').addEventListener('submit', async event => {
   event.preventDefault();
   const email = $('#authEmail').value.trim();
   const password = $('#authPassword').value;
+  const firstName = $('#authFirstName').value.trim();
+  const lastName = $('#authLastName').value.trim();
   const button = $('#authButton');
   $('#authError').textContent = '';
   if (!/^\S+@\S+\.\S+$/.test(email)) return void ($('#authError').textContent = 'Informe um e-mail válido.');
   if (password.length < 6) return void ($('#authError').textContent = 'A senha precisa ter pelo menos 6 caracteres.');
+  if (state.authMode === 'signup' && !firstName) return void ($('#authError').textContent = 'Informe seu nome.');
+  if (state.authMode === 'signup' && !lastName) return void ($('#authError').textContent = 'Informe seu sobrenome.');
   button.disabled = true;
   button.textContent = 'Aguarde…';
   try {
     const signup = state.authMode === 'signup';
-    signup ? await api.signup(email, password) : await api.login(email, password);
+    signup ? await api.signup(firstName, lastName, email, password) : await api.login(email, password);
     await showApp();
     toast(signup ? 'Conta criada com sucesso.' : 'Login realizado com sucesso.');
   } catch (error) {
@@ -697,6 +707,8 @@ $('#authSwitch').addEventListener('click', () => {
   state.authMode = state.authMode === 'login' ? 'signup' : 'login';
   $('#authError').textContent = '';
   $('#authPassword').value = '';
+  $('#authFirstName').value = '';
+  $('#authLastName').value = '';
   renderAuthMode();
 });
 
@@ -1046,7 +1058,7 @@ $('#expenseForm').addEventListener('submit', async event => {
 });
 
 $('#smartExpense').addEventListener('click', () => {
-  $('#smartExpenseForm').reset();
+  $('#smartExpenseForm')?.reset();
   $('#smartExpenseError').textContent = '';
   $('#smartExpenseModal').showModal();
   $('#smartExpenseText').focus();

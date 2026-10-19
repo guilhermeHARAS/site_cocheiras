@@ -26,6 +26,16 @@ class AccountTests(unittest.TestCase):
         self.assertFalse(verify(member, "membro@example.com", "senha-dono"))
         self.assertNotIn("password", member)
 
+    def test_new_account_preserves_first_and_last_name(self):
+        account = new_password_record(
+            "pessoa@example.com",
+            "senha-123",
+            first_name="Maria",
+            last_name="Ferreira",
+        )
+        self.assertEqual(account["firstName"], "Maria")
+        self.assertEqual(account["lastName"], "Ferreira")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -222,3 +222,14 @@ test('ficha oculta vazios e oferece completar cadastro', () => {
   assert.match(styles, /\.modal__form>\.modal__actions\{position:sticky/);
 });
 
+test('login não cria conta e cadastro exige identificação completa', () => {
+  const html = readFileSync(`${root}/frontend/index.html`, 'utf8');
+  const app = readFileSync(`${root}/frontend/app.js`, 'utf8');
+  const api = readFileSync(`${root}/frontend/api.js`, 'utf8');
+  for (const field of ['authFirstName', 'authLastName', 'authEmail', 'authPassword']) {
+    assert.match(html, new RegExp(`id="${field}"`));
+  }
+  assert.match(app, /signup \? await api\.signup\(firstName, lastName, email, password\) : await api\.login\(email, password\)/);
+  assert.match(api, /signup: \(firstName, lastName, email, password\)/);
+});
+

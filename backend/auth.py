@@ -10,13 +10,22 @@ ITERATIONS = 240_000
 SESSION_TTL = 60 * 60 * 24 * 90
 
 
-def new_password_record(email: str, password: str, *, workspace_id: str | None = None) -> dict[str, str | int]:
+def new_password_record(
+    email: str,
+    password: str,
+    *,
+    workspace_id: str | None = None,
+    first_name: str = "",
+    last_name: str = "",
+) -> dict[str, str | int]:
     salt = secrets.token_bytes(16)
     digest = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, ITERATIONS)
     return {
         "id": secrets.token_hex(16),
         "workspaceId": workspace_id or secrets.token_hex(16),
         "email": email.strip().lower(),
+        "firstName": first_name.strip()[:60],
+        "lastName": last_name.strip()[:60],
         "salt": salt.hex(),
         "password_hash": digest.hex(),
         "iterations": ITERATIONS,

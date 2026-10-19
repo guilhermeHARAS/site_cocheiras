@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=71">
+  <link rel="stylesheet" href="/styles.css?v=72">
 </head>
 <body>
   <svg class="ui-icon-sprite" aria-hidden="true">
@@ -40,6 +40,8 @@
       <h1 id="authTitle">Bem-vindo</h1>
       <p class="auth__copy" id="authCopy">Entre para acompanhar a cocheira.</p>
       <form class="auth__form" id="authForm" novalidate>
+        <label class="field" id="authFirstNameField" hidden><span>Nome</span><input id="authFirstName" type="text" autocomplete="given-name" maxlength="60" placeholder="Seu nome"></label>
+        <label class="field" id="authLastNameField" hidden><span>Sobrenome</span><input id="authLastName" type="text" autocomplete="family-name" maxlength="60" placeholder="Seu sobrenome"></label>
         <label class="field"><span>E-mail</span><input id="authEmail" type="email" autocomplete="username" placeholder="nome@exemplo.com" required></label>
         <label class="field"><span>Senha</span><input id="authPassword" type="password" autocomplete="current-password" minlength="6" placeholder="Mínimo de 6 caracteres" required></label>
         <p class="form-error" id="authError" role="alert"></p>
@@ -443,6 +445,6 @@
 
   <div class="toasts" id="toasts" aria-live="polite"></div>
   <div class="confetti" id="confetti"></div>
-  <script type="module" src="/app.js?v=71"></script>
+  <script type="module" src="/app.js?v=73"></script>
 </body>
 </html>

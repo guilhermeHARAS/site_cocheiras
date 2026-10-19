@@ -7,7 +7,7 @@ import uuid
 from datetime import date, datetime
 from typing import Any, Callable
 
-SCHEMA_VERSION = 6
+SCHEMA_VERSION = 7
 STAGES = ("creation", "foals", "training", "ready")
 STAGE_LABELS = {
     "creation": "Reprodução",
@@ -94,6 +94,8 @@ def normalize_state(
     accounts = [account for account in current["accounts"] if isinstance(account, dict)]
     for account in accounts:
         account["email"] = _bounded_text(account.get("email"), 254).lower()
+        account["firstName"] = _bounded_text(account.get("firstName"), 60)
+        account["lastName"] = _bounded_text(account.get("lastName"), 60)
         account["id"] = _bounded_text(account.get("id"), 64) or uuid.uuid4().hex
         account["workspaceId"] = _bounded_text(account.get("workspaceId"), 64) or uuid.uuid4().hex
     current["accounts"] = accounts

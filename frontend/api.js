@@ -45,7 +45,7 @@ function mutationOptions(method, payload) {
 
 export const api = {
   session: () => request('/api/session'),
-  signup: (email, password) => request('/api/signup', { method: 'POST', body: JSON.stringify({ email, password }) }),
+  signup: (firstName, lastName, email, password) => request('/api/signup', { method: 'POST', body: JSON.stringify({ firstName, lastName, email, password }) }),
   login: (email, password) => request('/api/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
   logout: () => request('/api/logout', { method: 'POST', body: '{}' }),
   account: () => request('/api/account'),
