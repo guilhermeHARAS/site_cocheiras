@@ -6,13 +6,13 @@ Sistema de acompanhamento da jornada dos cavalos: Cruzas, Potros, Em treinamento
 
 - `frontend/`: HTML, estilos, JavaScript, ícones e PWA.
 - `backend/`: servidor HTTP, API, autenticação, regras das etapas, assistente de consultas e persistência.
-- `backend/data/`: banco de dados JSON criado automaticamente no primeiro uso.
+- `backend/data/`: banco JSON usado somente quando o servidor roda sem PostgreSQL.
 
 ## Dados antigos
 
-Ao carregar um banco do primeiro protótipo, a migração mantém contas, senhas protegidas, sessões, IDs, fotos, campos dos cavalos e contagens de treinos. Cavalos antigos sem etapa são classificados em `Em treinamento`; aqueles com 60 treinos ou mais não são movidos automaticamente. A migração é idempotente e não inventa data de nascimento para idades aproximadas.
+Ao carregar um banco do primeiro protótipo, a migração mantém contas, senhas protegidas, sessões, IDs, campos dos cavalos e contagens de treinos. As fotos individuais foram descontinuadas e removidas por uma migração autorizada, sempre precedida por backup. Cavalos antigos sem etapa são classificados em `Em treinamento`; aqueles com 60 treinos ou mais não são movidos automaticamente. A migração é idempotente e não inventa data de nascimento para idades aproximadas.
 
-Antes de cada migração de formato, o servidor salva automaticamente uma cópia integral do estado bruto na tabela `app_state_backups`. O backup e a atualização da linha `app_state.id = 1` acontecem na mesma transação PostgreSQL, e o hash do conteúdo impede cópias duplicadas quando o servidor reinicia.
+Antes de cada migração de formato, o servidor salva automaticamente uma cópia integral do estado bruto na tabela `app_state_backups`. O hash do conteúdo impede cópias duplicadas quando o servidor reinicia. No PostgreSQL, contas, sessões, cavalos, despesas e controles contra cliques repetidos ficam em tabelas próprias e indexadas. A primeira migração confere as quantidades antes de ser confirmada. O servidor mantém uma cópia de leitura em memória e grava cada alteração no PostgreSQL antes de responder. Durante a estabilização, `app_state` também é atualizado nas gravações para permitir retorno seguro à versão anterior.
 
 ## Pergunte à Cocheira
 
