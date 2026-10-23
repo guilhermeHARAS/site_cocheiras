@@ -21,7 +21,7 @@ class MigrationTests(unittest.TestCase):
             }],
         }
 
-    def test_legacy_data_is_preserved_and_defaults_to_training(self):
+    def test_legacy_data_is_preserved_except_retired_photo_and_defaults_to_training(self):
         migrated = normalize_state(self.legacy, reference_date="2026-10-13")
         horse = migrated["horses"][0]
         account = migrated["accounts"][0]
@@ -31,7 +31,7 @@ class MigrationTests(unittest.TestCase):
         self.assertEqual(horse["workspaceId"], account["workspaceId"])
         self.assertEqual(migrated["sessions"], self.legacy["sessions"])
         self.assertEqual(horse["id"], "horse-1")
-        self.assertEqual(horse["photo"], "data:image/png;base64,AAA")
+        self.assertEqual(horse["photo"], "")
         self.assertEqual(horse["workouts"], 61)
         self.assertEqual(horse["stage"], "training")
         self.assertEqual(horse["age"], 3)
@@ -118,7 +118,7 @@ class LifecycleTests(unittest.TestCase):
         edited = validate_horse({"name": "Pronto Editado", "age": 5}, existing=current, stage="ready")
         self.assertEqual(edited["workouts"], 72)
 
-    def test_new_photos_are_ignored_but_legacy_photo_is_preserved(self):
+    def test_new_and_legacy_photos_are_removed(self):
         created = validate_horse({
             "stage": "training", "name": "Sem foto",
             "photo": "data:image/png;base64,NOVA",
@@ -130,7 +130,18 @@ class LifecycleTests(unittest.TestCase):
         edited = validate_horse({
             "name": "Legado editado", "photo": "data:image/png;base64,SUBSTITUTA",
         }, existing=legacy, stage="training")
-        self.assertEqual(edited["photo"], "data:image/png;base64,ANTIGA")
+        self.assertEqual(edited["photo"], "")
+
+        migrated = normalize_state({
+            "schemaVersion": 7,
+            "horses": [{
+                "id": "cavalo-com-foto",
+                "name": "Legado",
+                "photo": "data:image/png;base64,ANTIGA",
+            }],
+        })
+        self.assertEqual(migrated["schemaVersion"], 8)
+        self.assertEqual(migrated["horses"][0]["photo"], "")
 
     def test_location_is_optional_and_preserved_when_editing(self):
         horse = validate_horse({

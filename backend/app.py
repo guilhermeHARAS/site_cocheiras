@@ -119,8 +119,7 @@ class Handler(BaseHTTPRequestHandler):
 
     @staticmethod
     def _horse_payload(horse):
-        # Fotos legadas continuam preservadas no banco, mas a interface atual
-        # não as usa. Evita transferir megabytes escondidos em cada consulta.
+        # O campo foi descontinuado e é omitido também quando estiver vazio.
         return {key: value for key, value in horse.items() if key != "photo"}
 
     def _visible_horses(self, data):

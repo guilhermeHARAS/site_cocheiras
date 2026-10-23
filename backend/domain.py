@@ -7,7 +7,7 @@ import uuid
 from datetime import date, datetime
 from typing import Any, Callable
 
-SCHEMA_VERSION = 7
+SCHEMA_VERSION = 8
 STAGES = ("creation", "foals", "training", "ready")
 STAGE_LABELS = {
     "creation": "Reprodução",
@@ -138,9 +138,10 @@ def normalize_state(
         horse["owner"] = _bounded_text(horse.get("owner"), 100)
         horse["location"] = _bounded_text(horse.get("location"), 120)
         horse["notes"] = _bounded_text(horse.get("notes"), 600)
-        # A interface não aceita novas fotos, mas o conteúdo legado permanece
-        # armazenado para que uma migração nunca apague dados históricos.
-        horse["photo"] = str(horse.get("photo") or "")
+        # Fotos individuais foram descontinuadas. A migração para o esquema 8
+        # limpa somente esse campo; o estado anterior é salvo pela camada de
+        # persistência antes da atualização do banco.
+        horse["photo"] = ""
         horse["workouts"] = _integer(horse.get("workouts"), maximum=1_000_000)
         horse["lastWorkout"] = _valid_iso_date(horse.get("lastWorkout"))
         horse["birthDate"] = _valid_iso_date(horse.get("birthDate"))
@@ -227,9 +228,9 @@ def validate_horse(
         if not name:
             raise ValueError("Informe o nome do cavalo.")
 
-    # Novas fotos foram descontinuadas. Uma foto histórica, se existir, é mantida
-    # internamente e não pode ser substituída pelo formulário atual.
-    photo = str(current.get("photo") or "")
+    # Fotos individuais foram descontinuadas e não podem voltar por edições ou
+    # requisições antigas do navegador.
+    photo = ""
 
     birth_date = _birth_date(payload.get("birthDate", current.get("birthDate")), today)
     raw_age = payload.get("age", current.get("age"))
