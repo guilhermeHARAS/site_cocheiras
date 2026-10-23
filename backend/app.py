@@ -117,9 +117,19 @@ class Handler(BaseHTTPRequestHandler):
         account = self._account(data)
         return account.get("workspaceId") if account else None
 
+    @staticmethod
+    def _horse_payload(horse):
+        # Fotos legadas continuam preservadas no banco, mas a interface atual
+        # não as usa. Evita transferir megabytes escondidos em cada consulta.
+        return {key: value for key, value in horse.items() if key != "photo"}
+
     def _visible_horses(self, data):
         workspace = self._workspace(data)
-        return [horse for horse in data["horses"] if workspace and horse.get("workspaceId") == workspace]
+        return [
+            self._horse_payload(horse)
+            for horse in data["horses"]
+            if workspace and horse.get("workspaceId") == workspace
+        ]
 
     def _visible_expenses(self, data):
         workspace = self._workspace(data)
@@ -286,7 +296,7 @@ class Handler(BaseHTTPRequestHandler):
             raise LookupError
 
         try:
-            self._json(update(mutate))
+            self._json(self._horse_payload(update(mutate)))
         except LookupError:
             self._json({"error": "Cavalo não encontrado."}, HTTPStatus.NOT_FOUND)
         except ValueError as exc:
@@ -448,7 +458,8 @@ class Handler(BaseHTTPRequestHandler):
         data = self._data()
         horse["workspaceId"] = self._workspace(data)
         mutation_id = self._mutation_id()
-        self._json(update(lambda data: apply_once(data, mutation_id, lambda: self._insert(data, horse))), HTTPStatus.CREATED)
+        result = update(lambda data: apply_once(data, mutation_id, lambda: self._insert(data, horse)))
+        self._json(self._horse_payload(result), HTTPStatus.CREATED)
 
     def _create_expense(self, payload):
         data = self._data()
@@ -636,7 +647,7 @@ class Handler(BaseHTTPRequestHandler):
             return apply_once(data, mutation_id, operation)
 
         try:
-            self._json(update(mutate))
+            self._json(self._horse_payload(update(mutate)))
         except LookupError:
             self._json({"error": "Cavalo não encontrado."}, HTTPStatus.NOT_FOUND)
         except ValueError as exc:
@@ -662,7 +673,7 @@ class Handler(BaseHTTPRequestHandler):
             return apply_once(data, mutation_id, operation)
 
         try:
-            self._json(update(mutate))
+            self._json(self._horse_payload(update(mutate)))
         except LookupError:
             self._json({"error": "Cavalo não encontrado."}, HTTPStatus.NOT_FOUND)
         except ValueError as exc:
