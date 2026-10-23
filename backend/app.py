@@ -8,6 +8,7 @@ import mimetypes
 import os
 import re
 import socket
+import time
 import webbrowser
 from http import HTTPStatus
 from http.cookies import SimpleCookie
@@ -22,6 +23,8 @@ from costs import parse_expense_notes, parse_expense_spreadsheet, parse_expense_
 from domain import apply_once, change_workout, transition_horse, validate_horse
 from importer import duplicate_of, parse_notes, parse_spreadsheet, refresh_record
 from reports import financial_pdf, financial_xlsx
+from storage import close as close_storage
+from storage import initialize as initialize_storage
 from storage import load, update
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -42,6 +45,21 @@ class Handler(BaseHTTPRequestHandler):
 
     def log_message(self, fmt, *args):
         print(f"[{self.log_date_time_string()}] {fmt % args}")
+
+    def handle_one_request(self):
+        if hasattr(self, "_request_data"):
+            del self._request_data
+        started = time.perf_counter()
+        try:
+            return super().handle_one_request()
+        finally:
+            path = urlparse(getattr(self, "path", "")).path
+            if path.startswith("/api/"):
+                elapsed = (time.perf_counter() - started) * 1000
+                print(
+                    f"[PERF] http method={getattr(self, 'command', '-')} path={path} total={elapsed:.1f}ms",
+                    flush=True,
+                )
 
     def _json(self, payload, status=HTTPStatus.OK, cookie=None):
         body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
@@ -83,8 +101,13 @@ class Handler(BaseHTTPRequestHandler):
     def _mutation_id(self):
         return self.headers.get("Idempotency-Key", "").strip() or None
 
+    def _data(self):
+        if not hasattr(self, "_request_data"):
+            self._request_data = load()
+        return self._request_data
+
     def _authorized(self):
-        return valid_session(load(), self._token())
+        return valid_session(self._data(), self._token())
 
     def _account(self, data):
         email = session_email(data, self._token())
@@ -116,8 +139,23 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         path = urlparse(self.path).path
+        if path == "/api/bootstrap":
+            data = self._data()
+            email = session_email(data, self._token())
+            session = {
+                "setupRequired": not data["accounts"],
+                "authenticated": bool(email),
+                "email": email,
+            }
+            if not email:
+                return self._json({"session": session, "horses": [], "expenses": []})
+            return self._json({
+                "session": session,
+                "horses": self._visible_horses(data),
+                "expenses": self._visible_expenses(data),
+            })
         if path == "/api/session":
-            data = load()
+            data = self._data()
             email = session_email(data, self._token())
             return self._json({
                 "setupRequired": not data["accounts"],
@@ -126,12 +164,12 @@ class Handler(BaseHTTPRequestHandler):
             })
         if path == "/api/horses":
             if self._require_auth():
-                data = load()
+                data = self._data()
                 self._json(self._visible_horses(data))
             return
         if path == "/api/account":
             if self._require_auth():
-                data = load()
+                data = self._data()
                 account = self._account(data)
                 workspace = account.get("workspaceId") if account else None
                 emails = sorted(item["email"] for item in data["accounts"] if item.get("workspaceId") == workspace)
@@ -139,7 +177,7 @@ class Handler(BaseHTTPRequestHandler):
             return
         if path == "/api/expenses":
             if self._require_auth():
-                data = load()
+                data = self._data()
                 self._json(self._visible_expenses(data))
             return
         report_match = re.fullmatch(r"/api/reports/financial\.(pdf|xlsx)", path)
@@ -147,7 +185,7 @@ class Handler(BaseHTTPRequestHandler):
             if not self._require_auth():
                 return
             try:
-                data = load()
+                data = self._data()
                 period = parse_qs(urlparse(self.path).query).get("period", [""])[0]
                 content = financial_pdf(self._visible_expenses(data), self._visible_horses(data), period) if report_match.group(1) == "pdf" else financial_xlsx(self._visible_expenses(data), self._visible_horses(data), period)
                 mime = "application/pdf" if report_match.group(1) == "pdf" else "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -184,7 +222,7 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/expenses/import/commit":
             return self._expense_import_commit(payload)
         if path == "/api/expenses/parse":
-            data = load()
+            data = self._data()
             try:
                 return self._json(parse_expense_text(str(payload.get("text") or ""), self._visible_horses(data)))
             except ValueError as exc:
@@ -197,7 +235,7 @@ class Handler(BaseHTTPRequestHandler):
             return self._import_commit(payload)
         if path == "/api/assistant":
             try:
-                data = load()
+                data = self._data()
                 return self._json(answer_question(
                     self._visible_horses(data),
                     payload.get("question", ""),
@@ -236,7 +274,7 @@ class Handler(BaseHTTPRequestHandler):
         except ValueError as exc:
             return self._json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
         horse_id = match.group(1)
-        snapshot = load()
+        snapshot = self._data()
         workspace = self._workspace(snapshot)
 
         def mutate(data):
@@ -289,7 +327,7 @@ class Handler(BaseHTTPRequestHandler):
         expense_match = re.fullmatch(r"/api/expenses/([^/]+)", path)
         if expense_match:
             expense_id = expense_match.group(1)
-            snapshot = load()
+            snapshot = self._data()
             workspace = self._workspace(snapshot)
 
             def remove_expense(data):
@@ -307,7 +345,7 @@ class Handler(BaseHTTPRequestHandler):
         if not match:
             return self._json({"error": "Rota não encontrada."}, HTTPStatus.NOT_FOUND)
         horse_id = match.group(1)
-        snapshot = load()
+        snapshot = self._data()
         workspace = self._workspace(snapshot)
 
         def mutate(data):
@@ -392,7 +430,7 @@ class Handler(BaseHTTPRequestHandler):
         self._json({"ok": True, "email": email}, HTTPStatus.CREATED, self._session_cookie(token))
 
     def _login(self, payload):
-        data = load()
+        data = self._data()
         email = str(payload.get("email", "")).strip().lower()
         account = next((item for item in data["accounts"] if item.get("email") == email), None)
         if not account:
@@ -407,13 +445,13 @@ class Handler(BaseHTTPRequestHandler):
             horse = validate_horse(payload, stage=str(payload.get("stage") or "training"))
         except ValueError as exc:
             return self._json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
-        data = load()
+        data = self._data()
         horse["workspaceId"] = self._workspace(data)
         mutation_id = self._mutation_id()
         self._json(update(lambda data: apply_once(data, mutation_id, lambda: self._insert(data, horse))), HTTPStatus.CREATED)
 
     def _create_expense(self, payload):
-        data = load()
+        data = self._data()
         workspace = self._workspace(data)
         try:
             expense = validate_expense(payload)
@@ -437,7 +475,7 @@ class Handler(BaseHTTPRequestHandler):
         return expense
 
     def _update_expense(self, expense_id, payload):
-        snapshot = load()
+        snapshot = self._data()
         workspace = self._workspace(snapshot)
 
         def mutate(data):
@@ -482,7 +520,7 @@ class Handler(BaseHTTPRequestHandler):
         if not isinstance(records, list) or not records or len(records) > 2_000:
             return self._json({"error": "Selecione entre 1 e 2.000 despesas."}, HTTPStatus.BAD_REQUEST)
         mutation_id = self._mutation_id()
-        snapshot = load()
+        snapshot = self._data()
         workspace = self._workspace(snapshot)
 
         def mutate(data):
@@ -527,7 +565,7 @@ class Handler(BaseHTTPRequestHandler):
         except (ValueError, RuntimeError) as exc:
             return self._json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
 
-        data = load()
+        data = self._data()
         horses = list(self._visible_horses(data))
         for record in result["records"]:
             duplicate = duplicate_of(record, horses)
@@ -542,7 +580,7 @@ class Handler(BaseHTTPRequestHandler):
         if not isinstance(records, list) or not records or len(records) > 2_000:
             return self._json({"error": "Selecione entre 1 e 2.000 cadastros."}, HTTPStatus.BAD_REQUEST)
         mutation_id = self._mutation_id()
-        snapshot = load()
+        snapshot = self._data()
         workspace = self._workspace(snapshot)
 
         def mutate(data):
@@ -586,7 +624,7 @@ class Handler(BaseHTTPRequestHandler):
     def _transition(self, horse_id, payload):
         target = str(payload.get("target") or "")
         mutation_id = self._mutation_id()
-        snapshot = load()
+        snapshot = self._data()
         workspace = self._workspace(snapshot)
 
         def mutate(data):
@@ -612,7 +650,7 @@ class Handler(BaseHTTPRequestHandler):
         if delta not in (-1, 1):
             return self._json({"error": "Alteração de treino inválida."}, HTTPStatus.BAD_REQUEST)
         mutation_id = self._mutation_id()
-        snapshot = load()
+        snapshot = self._data()
         workspace = self._workspace(snapshot)
 
         def mutate(data):
@@ -654,6 +692,7 @@ def main():
     parser.add_argument("--port", type=int, default=int(os.environ.get("PORT", "8000")))
     parser.add_argument("--no-browser", action="store_true")
     args = parser.parse_args()
+    initialize_storage()
     server = AppHTTPServer((args.host, args.port), Handler)
     browser_host = "127.0.0.1" if args.host in ("0.0.0.0", "::") else args.host
     url = f"http://{browser_host}:{args.port}"
@@ -676,6 +715,7 @@ def main():
         print("\nServidor encerrado.")
     finally:
         server.server_close()
+        close_storage()
 
 
 if __name__ == "__main__":

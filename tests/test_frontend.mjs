@@ -233,3 +233,13 @@ test('login não cria conta e cadastro exige identificação completa', () => {
   assert.match(api, /signup: \(firstName, lastName, email, password\)/);
 });
 
+test('inicialização usa uma única chamada para sessão, cavalos e despesas', () => {
+  const app = readFileSync(`${root}/frontend/app.js`, 'utf8');
+  const api = readFileSync(`${root}/frontend/api.js`, 'utf8');
+  assert.match(api, /bootstrap: \(\) => request\('\/api\/bootstrap'\)/);
+  assert.match(app, /const bootstrap = await api\.bootstrap\(\)/);
+  assert.match(app, /state\.horses = Array\.isArray\(bootstrap\.horses\)/);
+  assert.match(app, /state\.expenses = Array\.isArray\(bootstrap\.expenses\)/);
+  assert.doesNotMatch(app, /async function showApp\([^)]*\) \{[\s\S]{0,500}await loadHorses\(\)/);
+});
+

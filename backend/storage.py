@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 import threading
+import time
 from pathlib import Path
 from typing import Any
 
@@ -21,27 +22,80 @@ DATABASE_NAME = os.environ.get("DATABASE_NAME", "postgres").strip()
 DATABASE_CONFIGURED = bool(DATABASE_URL or DATABASE_PASSWORD)
 LEGACY_OWNER_EMAIL = os.environ.get("LEGACY_OWNER_EMAIL", "caio.ferreira@radames").strip().lower()
 _lock = threading.RLock()
+_database_lock = threading.Lock()
+_pool = None
+_database_ready = False
+PERF_LOG_ENABLED = os.environ.get("PERF_LOG_ENABLED", "1").strip().lower() not in {"0", "false", "no"}
 
 
 if DATABASE_CONFIGURED:
     try:
         import psycopg
+        from psycopg_pool import ConnectionPool
         from psycopg.types.json import Jsonb
     except ImportError as exc:
         raise RuntimeError("Instale as dependências com: pip install -r requirements.txt") from exc
 
 
+def _log_performance(operation: str, started: float, **details: float) -> None:
+    if not PERF_LOG_ENABLED:
+        return
+    elapsed = (time.perf_counter() - started) * 1000
+    suffix = " ".join(f"{key}={value:.1f}ms" for key, value in details.items())
+    print(f"[PERF] storage.{operation} total={elapsed:.1f}ms{(' ' + suffix) if suffix else ''}", flush=True)
+
+
+def _pool_instance():
+    global _pool
+    if _pool is not None:
+        return _pool
+    with _database_lock:
+        if _pool is None:
+            if DATABASE_PASSWORD:
+                conninfo = psycopg.conninfo.make_conninfo(
+                    host=DATABASE_HOST,
+                    dbname=DATABASE_NAME,
+                    user=DATABASE_USER,
+                    password=DATABASE_PASSWORD,
+                )
+            else:
+                conninfo = DATABASE_URL
+            _pool = ConnectionPool(
+                conninfo=conninfo,
+                min_size=1,
+                max_size=6,
+                timeout=10,
+                open=True,
+                kwargs={"connect_timeout": 10, "sslmode": "require"},
+            )
+    return _pool
+
+
+def initialize() -> None:
+    """Prepara banco e pool uma única vez durante a inicialização do servidor."""
+    global _database_ready
+    if not DATABASE_CONFIGURED or _database_ready:
+        return
+    pool = _pool_instance()
+    with _database_lock:
+        if _database_ready:
+            return
+        with pool.connection() as connection:
+            _ensure_database(connection)
+        _database_ready = True
+
+
+def close() -> None:
+    global _pool, _database_ready
+    if _pool is not None:
+        _pool.close()
+    _pool = None
+    _database_ready = False
+
+
 def _connect():
-    if DATABASE_PASSWORD:
-        return psycopg.connect(
-            host=DATABASE_HOST,
-            dbname=DATABASE_NAME,
-            user=DATABASE_USER,
-            password=DATABASE_PASSWORD,
-            connect_timeout=10,
-            sslmode="require",
-        )
-    return psycopg.connect(DATABASE_URL, connect_timeout=10, sslmode="require")
+    initialize()
+    return _pool_instance().connection()
 
 
 def _ensure() -> None:
@@ -59,14 +113,22 @@ def _write_local(data: dict[str, Any]) -> None:
 
 def load() -> dict[str, Any]:
     if DATABASE_CONFIGURED:
+        started = time.perf_counter()
         with _connect() as connection:
-            _ensure_database(connection)
             row = connection.execute("SELECT data FROM app_state WHERE id = 1").fetchone()
+            queried = time.perf_counter()
             source = row[0] if row else empty_state()
             data = normalize_state(source, legacy_owner_email=LEGACY_OWNER_EMAIL)
+            normalized = time.perf_counter()
             if data != source:
                 _backup_before_migration(connection, source)
                 connection.execute("UPDATE app_state SET data = %s WHERE id = 1", (Jsonb(data),))
+            _log_performance(
+                "load",
+                started,
+                query=(queried - started) * 1000,
+                normalize=(normalized - queried) * 1000,
+            )
             return data
     with _lock:
         _ensure()
@@ -83,9 +145,10 @@ def load() -> dict[str, Any]:
 def save(data: dict[str, Any]) -> None:
     data = normalize_state(data, legacy_owner_email=LEGACY_OWNER_EMAIL)
     if DATABASE_CONFIGURED:
+        started = time.perf_counter()
         with _connect() as connection:
-            _ensure_database(connection)
             connection.execute("UPDATE app_state SET data = %s WHERE id = 1", (Jsonb(data),))
+        _log_performance("save", started)
         return
     with _lock:
         _write_local(data)
@@ -93,8 +156,8 @@ def save(data: dict[str, Any]) -> None:
 
 def update(mutator):
     if DATABASE_CONFIGURED:
+        started = time.perf_counter()
         with _connect() as connection:
-            _ensure_database(connection)
             row = connection.execute("SELECT data FROM app_state WHERE id = 1 FOR UPDATE").fetchone()
             source = row[0] if row else empty_state()
             data = normalize_state(source, legacy_owner_email=LEGACY_OWNER_EMAIL)
@@ -102,6 +165,7 @@ def update(mutator):
                 _backup_before_migration(connection, source)
             result = mutator(data)
             connection.execute("UPDATE app_state SET data = %s WHERE id = 1", (Jsonb(data),))
+            _log_performance("update", started)
             return result
     with _lock:
         data = load()

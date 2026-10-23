@@ -186,15 +186,23 @@ function renderAuthMode() {
   $('#authLastName').required = signup;
 }
 
-async function showApp() {
+async function showApp(initial = null) {
+  const bootstrap = initial || await api.bootstrap();
+  if (!bootstrap.session?.authenticated) {
+    showAuth(bootstrap.session || { setupRequired: false, authenticated: false, email: null });
+    return;
+  }
   $('#auth').hidden = true;
   $('#app').hidden = false;
   state.stage = null;
   state.costs = false;
   state.query = '';
   $('#search').value = '';
-  await loadHorses();
-  await loadExpenses();
+  state.accountEmail = bootstrap.session.email || '';
+  state.horses = Array.isArray(bootstrap.horses) ? bootstrap.horses : [];
+  state.expenses = Array.isArray(bootstrap.expenses) ? bootstrap.expenses : [];
+  render();
+  renderCosts();
 }
 
 async function loadHorses() {
@@ -1168,8 +1176,8 @@ initializeQuickCapture({
 
 async function start() {
   try {
-    const session = await api.session();
-    session.authenticated ? await showApp() : showAuth(session);
+    const bootstrap = await api.bootstrap();
+    bootstrap.session?.authenticated ? await showApp(bootstrap) : showAuth(bootstrap.session);
   } catch {
     showAuth({ setupRequired: false, authenticated: false, email: null });
     $('#authError').textContent = 'Não foi possível conectar ao servidor.';
