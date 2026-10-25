@@ -260,6 +260,18 @@ test('ficha gera cartão em PNG e compartilha pelo WhatsApp', () => {
   assert.match(styles, /\.horse-details__actions \.button--share/);
 });
 
+test('ficha mantém ações visíveis e arquivos não escapam do cadastro rápido', () => {
+  const html = readFileSync(`${root}/frontend/index.html`, 'utf8');
+  const styles = readFileSync(`${root}/frontend/styles.css`, 'utf8');
+  assert.match(html, /styles\.css\?v=80/);
+  assert.match(styles, /\.horse-details\[open\]\{display:flex;flex-direction:column/);
+  assert.match(styles, /\.horse-details__body\{flex:1 1 auto;min-height:0;max-height:none;overflow-y:auto/);
+  assert.match(styles, /\.horse-details__actions\{position:relative;z-index:5/);
+  assert.match(styles, /\.quick-capture\[open\]\{display:flex;flex-direction:column/);
+  assert.match(styles, /\.upload-drop input\[type="file"\],\.capture-file input\[type="file"\]\{[^}]*width:100%/);
+  assert.match(styles, /::file-selector-button/);
+});
+
 test('login não cria conta e cadastro exige identificação completa', () => {
   const html = readFileSync(`${root}/frontend/index.html`, 'utf8');
   const app = readFileSync(`${root}/frontend/app.js`, 'utf8');
