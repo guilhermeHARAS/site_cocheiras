@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=75">
+  <link rel="stylesheet" href="/styles.css?v=79">
 </head>
 <body>
   <svg class="ui-icon-sprite" aria-hidden="true">
@@ -32,6 +32,7 @@
     <symbol id="ui-icon-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3A1.7 1.7 0 0 0 10 3V2.8h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"></path></symbol>
     <symbol id="ui-icon-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 20c.7-4 3-6 7-6s6.3 2 7 6"></path></symbol>
     <symbol id="ui-icon-logout" viewBox="0 0 24 24"><path d="M10 5H5v14h5M14 8l4 4-4 4M8 12h10"></path></symbol>
+    <symbol id="ui-icon-share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="2.5"></circle><circle cx="6" cy="12" r="2.5"></circle><circle cx="18" cy="19" r="2.5"></circle><path d="m8.2 10.8 7.6-4.5M8.2 13.2l7.6 4.5"></path></symbol>
   </svg>
   <section class="auth" id="auth" aria-labelledby="authTitle">
     <div class="auth__panel">
@@ -205,6 +206,7 @@
     <div class="horse-details__body" id="horseDetailsBody"></div>
     <div class="horse-details__actions">
       <button class="button button--soft detail-close" type="button">Fechar</button>
+      <button class="button button--share" id="detailShare" type="button"><svg class="ui-icon" aria-hidden="true"><use href="#ui-icon-share"></use></svg><span>Compartilhar no WhatsApp</span></button>
       <button class="button button--primary" id="detailEdit" type="button">Editar cadastro</button>
     </div>
   </dialog>
@@ -435,9 +437,9 @@
             <option value="classic">Clássica — Playfair Display</option>
             <option value="modern">Moderna — DM Sans</option>
           </select></label>
-          <label class="field font-size-control"><span>Tamanho da fonte <output id="fontSizeValue" for="fontSizePreference">100%</output></span><input id="fontSizePreference" type="range" min="85" max="125" step="5" value="100"></label>
+          <label class="field font-size-control"><span>Tamanho da fonte <output id="fontSizeValue" for="fontSizePreference">100%</output></span><input id="fontSizePreference" type="range" min="85" max="160" step="5" value="100"></label>
         </div>
-        <div class="font-size-scale" aria-hidden="true"><span>Menor</span><span>Padrão</span><span>Maior</span></div>
+        <div class="font-size-scale" aria-hidden="true"><span>85%</span><span>100%</span><span>130%</span><span>160%</span></div>
         <div class="appearance-preview"><span>EXEMPLO</span><strong>60 treinos · 3 anos</strong><p>Informações claras e elegantes.</p></div>
       </section>
     </div>
@@ -445,6 +447,6 @@
 
   <div class="toasts" id="toasts" aria-live="polite"></div>
   <div class="confetti" id="confetti"></div>
-  <script type="module" src="/app.js?v=75"></script>
+  <script type="module" src="/app.js?v=79"></script>
 </body>
 </html>

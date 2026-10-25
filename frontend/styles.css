@@ -218,6 +218,34 @@ body{font-size:calc(15px * var(--font-scale))}
 /* Evita o zoom automático do iPhone ao focar campos pequenos e o zoom por toque duplo. */
 @media(max-width:620px){input,select,textarea{font-size:16px!important}button,.button,[role="button"]{touch-action:manipulation}html,body{max-width:100%;overflow-x:hidden}}
 
+/* Ficha do animal: identidade verde alinhada ao visual principal da Cocheira. */
+.horse-details{border:1px solid rgba(239,209,131,.48);background:var(--forest);box-shadow:0 32px 95px rgba(3,20,14,.58)}
+.horse-details .modal__head{border-bottom:1px solid rgba(255,255,255,.13);background:linear-gradient(115deg,#0c281e,#174532)}
+.horse-details .modal__head .eyebrow{color:#efd183}
+.horse-details .modal__head h2{color:#fff}
+.horse-details .detail-close.icon-button{border:1px solid rgba(239,209,131,.35);background:rgba(255,255,255,.08);color:#fff}
+.horse-details__body{background:radial-gradient(circle at 92% 8%,rgba(200,157,74,.16),transparent 34%),linear-gradient(145deg,#123b2c,#0d2d22)}
+.horse-details .horse-detail-stage{border-color:rgba(239,209,131,.65);background:rgba(239,209,131,.12);color:#f4d98f}
+.horse-details .horse-detail-item{border-color:rgba(255,255,255,.15);background:rgba(255,255,255,.075)}
+.horse-details .horse-detail-item span,.horse-details .horse-detail-pedigree>p,.horse-details .horse-detail-notes>span{color:#efd183}
+.horse-details .horse-detail-item strong{color:#fff}
+.horse-details .horse-detail-pedigree{border-color:rgba(239,209,131,.38);background:rgba(255,255,255,.055)}
+.horse-details .horse-detail-pedigree::before{background:#d6ae55}
+.horse-details .horse-detail-pedigree .horse-detail-item{border-color:rgba(239,209,131,.22);background:rgba(255,255,255,.07)}
+.horse-details .horse-detail-pedigree .horse-detail-item strong{color:#fff}
+.horse-details .horse-detail-training{border:1px solid rgba(239,209,131,.3);background:rgba(3,25,17,.38)}
+.horse-details .horse-detail-notes{border-color:#d6ae55;background:rgba(255,255,255,.075)}
+.horse-details .horse-detail-notes p{color:#eef5f1}
+.horse-details .horse-detail-missing{border-color:rgba(239,209,131,.5);background:#f7eac3}
+.horse-details .horse-detail-ready{border-color:#e0bd67;background:#f4dd92}
+.horse-details__actions{border-top-color:rgba(255,255,255,.13);background:#0b271d}
+.horse-details__actions .button--soft{border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff}
+.horse-details__actions .button--share{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:1px solid rgba(239,209,131,.62);background:rgba(239,209,131,.1);color:#f4d98f}
+.horse-details__actions .button--share:hover{background:rgba(239,209,131,.18)}
+.horse-details__actions .button--share .ui-icon{width:17px;height:17px}
+.horse-details__actions .button--primary{background:#d2aa52;color:#102f24;box-shadow:none}
+@media(max-width:620px){.horse-details__actions{display:grid;grid-template-columns:1fr 1fr}.horse-details__actions .button--share{grid-column:1/-1;grid-row:1}.horse-details__actions .button{width:100%}}
+
 /* Nomes dos animais: destaque consistente sem alterar o valor salvo. */
 .horse-identity__name h2{text-transform:uppercase;letter-spacing:.025em}
 
@@ -237,7 +265,7 @@ body{font-size:calc(15px * var(--font-scale))}
 .creation-card__date-label,
 .creation-card__date strong,
 .creation-card__label,
-.creation-card__pair,
+.creation-card__pair{text-transform:uppercase}
 
 /* Ações principais reunidas no canto inferior direito. */
 .floating-tools{position:fixed;right:18px;bottom:18px;z-index:20;display:grid;justify-items:end;gap:8px}
@@ -308,3 +336,39 @@ body{font-size:calc(15px * var(--font-scale))}
 .horse-identity--ready{grid-template-columns:106px 1fr;min-height:160px}
 .horse-identity--ready .horse-identity__silhouette{width:99px;height:127px;object-fit:contain}
 @media(max-width:620px){.horse-identity--ready{grid-template-columns:92px 1fr;min-height:142px}.horse-identity--ready .horse-identity__silhouette{width:87px;height:113px}}
+
+/* Leitura ampliada: o controle chega a 160% sem sobrepor textos ou ícones. */
+.stage-menu .stage-card__name{font-size:calc(26px * var(--font-scale))}
+.stage-menu .stage-card__hint{font-size:calc(11px * var(--font-scale));line-height:1.3}
+.horse-identity__name h2{font-size:calc(20px * var(--font-scale));line-height:1.12}
+.horse-identity__name p{font-size:calc(10px * var(--font-scale))}
+.horse-identity__status span{font-size:calc(8px * var(--font-scale))}
+.horse-identity__status strong{font-size:calc(14px * var(--font-scale))}
+.horse-card__age,.horse-card__breed,.horse-card__owner{font-size:calc(11px * var(--font-scale))}
+.horse-card .button{min-height:calc(39px * var(--font-scale));padding-block:6px;font-size:calc(11px * var(--font-scale));line-height:1.2;white-space:normal}
+.horse-card .button--soft,.card-actions button{font-size:calc(10px * var(--font-scale))}
+.button{padding-block:7px;line-height:1.2;white-space:normal}
+.field input,.field select,.field textarea{font-size:calc(14px * var(--font-scale))}
+.horse-detail-item span,.horse-detail-training span,.horse-detail-notes>span,.horse-detail-pedigree>p{font-size:calc(8px * var(--font-scale))}
+.horse-detail-training strong,.horse-detail-ready strong{font-size:calc(13px * var(--font-scale))}
+.horse-detail-notes p{font-size:calc(12px * var(--font-scale))}
+.cost-row__info strong{font-size:calc(12px * var(--font-scale))}.cost-row__info span{font-size:calc(9px * var(--font-scale))}.cost-row>b{font-size:calc(13px * var(--font-scale))}
+.assistant-message,.assistant__form input{font-size:calc(13px * var(--font-scale))}
+.font-size-expanded .stage-menu .stage-card{grid-template-rows:auto 76px auto auto;min-height:270px}
+.font-size-expanded .horse-identity{min-height:185px}
+.font-size-expanded .horse-detail-summary .horse-detail-item{min-width:260px}
+.font-size-expanded .costs-simple .cost-row{grid-template-columns:58px minmax(0,1fr) 120px auto}
+@media(max-width:620px){
+  .stage-menu .stage-card__name{font-size:calc(15px * var(--font-scale))}
+  .stage-menu .stage-card__hint{font-size:calc(9px * var(--font-scale))}
+  .horse-identity__name h2{font-size:calc(18px * var(--font-scale))}
+  .horse-identity__status strong{font-size:calc(12px * var(--font-scale))}
+  .horse-card__age,.horse-card__breed,.horse-card__owner{font-size:calc(9px * var(--font-scale))}
+  input,select,textarea{font-size:max(16px,calc(14px * var(--font-scale)))!important}
+  .font-size-expanded .stage-menu .stage-card{grid-template-rows:auto 58px auto auto;min-height:250px;padding:13px 11px}
+  .font-size-expanded .horse-identity{grid-template-columns:75px minmax(0,1fr);min-height:185px}
+  .font-size-expanded .horse-detail-summary .horse-detail-item{min-width:0}
+  .font-size-expanded .costs-simple .cost-row{grid-template-columns:45px minmax(0,1fr);align-items:start}
+  .font-size-expanded .costs-simple .cost-row>b{grid-column:2;text-align:left}
+  .font-size-expanded .costs-simple .cost-row__actions{grid-column:2}
+}

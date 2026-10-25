@@ -64,6 +64,7 @@ test('gerenciamento oferece fontes e tamanhos persistentes', () => {
   const styles = readFileSync(`${root}/frontend/styles.css`, 'utf8');
   assert.match(html, /id="fontPreference"/);
   assert.match(html, /id="fontSizePreference" type="range"/);
+  assert.match(html, /id="fontSizePreference"[^>]*max="160"/);
   assert.match(html, /id="manageAppearance"/);
   assert.match(html, /id="openSettings"/);
   assert.match(html, /id="settingsMenu"/);
@@ -73,7 +74,11 @@ test('gerenciamento oferece fontes e tamanhos persistentes', () => {
   assert.match(app, /localStorage\.setItem/);
   assert.match(styles, /data-font="professional"|--text:"DM Sans"/);
   assert.match(app, /--font-scale/);
+  assert.match(app, /Math\.min\(160, Math\.max\(85/);
+  assert.match(app, /font-size-expanded/);
   assert.match(styles, /font-size-control/);
+  assert.match(styles, /Leitura ampliada/);
+  assert.match(styles, /font-size-expanded \.stage-menu \.stage-card/);
   assert.match(styles, /settings-popover/);
 });
 
@@ -149,6 +154,8 @@ test('reprodução simplificada, transferência permanece na etapa e celular nã
   assert.match(capture, /Previsão de nascimento \(opcional\)/);
   assert.match(capture, /Drink x Juíza/);
   assert.match(styles, /input,select,textarea\{font-size:16px!important\}/);
+  assert.match(styles, /\.creation-card__pair\{text-transform:uppercase\}/);
+  assert.doesNotMatch(styles, /\.creation-card__pair,\s*\/\* Ações principais/);
 });
 
 test('contadores das etapas explicam que representam quantidades', () => {
@@ -233,6 +240,24 @@ test('ficha oculta vazios e oferece completar cadastro', () => {
   assert.match(styles, /\.horse-detail-summary\{display:flex;flex-wrap:wrap/);
   assert.match(styles, /\.horse-detail-pedigree \.horse-detail-item strong/);
   assert.match(styles, /\.modal__form>\.modal__actions\{position:sticky/);
+  assert.match(styles, /\.horse-details\{[^}]*background:var\(--forest\)/);
+  assert.match(styles, /\.horse-details__body\{background:[^}]*linear-gradient/);
+  assert.match(styles, /\.horse-details \.horse-detail-item strong\{color:#fff\}/);
+});
+
+test('ficha gera cartão em PNG e compartilha pelo WhatsApp', () => {
+  const html = readFileSync(`${root}/frontend/index.html`, 'utf8');
+  const app = readFileSync(`${root}/frontend/app.js`, 'utf8');
+  const styles = readFileSync(`${root}/frontend/styles.css`, 'utf8');
+  assert.match(html, /id="detailShare"/);
+  assert.match(html, /ui-icon-share/);
+  assert.match(app, /function horseShareFields/);
+  assert.match(app, /createHorseShareCard/);
+  assert.match(app, /canvas\.toBlob/);
+  assert.match(app, /navigator\.canShare/);
+  assert.match(app, /navigator\.share/);
+  assert.match(app, /https:\/\/wa\.me\/\?text=/);
+  assert.match(styles, /\.horse-details__actions \.button--share/);
 });
 
 test('login não cria conta e cadastro exige identificação completa', () => {

@@ -33,7 +33,7 @@ function readAppearance() {
     const requestedSize = legacySizes[stored.size] || Number(stored.size);
     return {
       font: FONT_OPTIONS.has(stored.font) ? stored.font : 'professional',
-      size: Number.isFinite(requestedSize) ? Math.min(125, Math.max(85, requestedSize)) : 100,
+      size: Number.isFinite(requestedSize) ? Math.min(160, Math.max(85, requestedSize)) : 100,
     };
   } catch {
     return { font: 'professional', size: 100 };
@@ -43,9 +43,10 @@ function readAppearance() {
 function applyAppearance(preference, save = false) {
   const font = FONT_OPTIONS.has(preference.font) ? preference.font : 'professional';
   const requestedSize = Number(preference.size);
-  const size = Number.isFinite(requestedSize) ? Math.min(125, Math.max(85, requestedSize)) : 100;
+  const size = Number.isFinite(requestedSize) ? Math.min(160, Math.max(85, requestedSize)) : 100;
   document.documentElement.dataset.font = font;
   document.documentElement.dataset.fontSize = String(size);
+  document.documentElement.classList.toggle('font-size-expanded', size >= 130);
   document.documentElement.style.setProperty('--font-scale', String(size / 100));
   if ($('#fontPreference')) $('#fontPreference').value = font;
   if ($('#fontSizePreference')) $('#fontSizePreference').value = String(size);
@@ -466,6 +467,167 @@ function openHorseDetails(horse) {
     horse.notes ? '<section class="horse-detail-notes"><span>OBSERVAÇÕES</span><p>' + escapeHtml(horse.notes) + '</p></section>' : '',
   ].join('');
   $('#horseDetailsModal').showModal();
+}
+
+function horseShareFields(horse) {
+  const isCreation = horse.stage === 'creation';
+  const hasAge = Boolean(horse.birthDate) || horse.age !== null && horse.age !== undefined && horse.age !== '';
+  const fields = [];
+  const add = (label, value) => { if (value !== null && value !== undefined && String(value).trim()) fields.push([label, String(value).trim()]); };
+  if (isCreation) add('Previsão de nascimento', horse.expectedBirthDate ? formatDate(horse.expectedBirthDate) : 'Sem previsão');
+  else {
+    add('Idade', hasAge ? ageLabel(horse) : '');
+    add('Nascimento', horse.birthDate ? formatDate(horse.birthDate) : '');
+  }
+  add('Pai', horse.father);
+  add('Mãe', horse.mother);
+  add('Raça', horse.breed);
+  add('Sexo', horse.sex);
+  add('Proprietário', horse.owner);
+  if (!isCreation) add('Localização', horse.location);
+  if (horse.stage === 'training') {
+    add('Treinos', (Number(horse.workouts) || 0) + ' de ' + GOAL);
+    add('Último treino', horse.lastWorkout ? formatDate(horse.lastWorkout) : 'Nenhum registrado');
+  }
+  if (horse.stage === 'ready') add('Situação', 'Pronto para torneio');
+  add('Observações', horse.notes);
+  return fields;
+}
+
+function horseShareText(horse) {
+  const stage = STAGES[horse.stage] || STAGES.training;
+  const name = horse.stage === 'creation'
+    ? [horse.father, horse.mother].filter(Boolean).join(' × ') || 'Cruza registrada'
+    : horse.name || 'Cavalo';
+  return [
+    '*COCHEIRA RADAMÉS*',
+    '*' + name.toLocaleUpperCase('pt-BR') + '*',
+    stage.title,
+    '',
+    ...horseShareFields(horse).map(([label, value]) => '*' + label + ':* ' + value),
+  ].join('\n');
+}
+
+function wrapCanvasText(context, text, maxWidth) {
+  const words = String(text).split(/\s+/).filter(Boolean);
+  const lines = [];
+  let line = '';
+  words.forEach(word => {
+    const candidate = line ? line + ' ' + word : word;
+    if (line && context.measureText(candidate).width > maxWidth) {
+      lines.push(line);
+      line = word;
+    } else line = candidate;
+  });
+  if (line) lines.push(line);
+  return lines.length ? lines : [''];
+}
+
+function canvasToBlob(canvas) {
+  return new Promise((resolve, reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Não foi possível gerar o cartão.')), 'image/png'));
+}
+
+function fillRoundedRect(context, x, y, width, height, radius) {
+  const r = Math.min(radius, width / 2, height / 2);
+  context.beginPath();
+  context.moveTo(x + r, y);
+  context.lineTo(x + width - r, y);
+  context.quadraticCurveTo(x + width, y, x + width, y + r);
+  context.lineTo(x + width, y + height - r);
+  context.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+  context.lineTo(x + r, y + height);
+  context.quadraticCurveTo(x, y + height, x, y + height - r);
+  context.lineTo(x, y + r);
+  context.quadraticCurveTo(x, y, x + r, y);
+  context.closePath();
+  context.fill();
+}
+
+async function createHorseShareCard(horse) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 1080;
+  const fields = horseShareFields(horse);
+  const contentHeight = fields.reduce((total, [label]) => total + (label === 'Observações' ? 164 : 108), 0);
+  canvas.height = Math.max(1350, 700 + contentHeight);
+  const context = canvas.getContext('2d');
+  if (!context) throw new Error('Este navegador não conseguiu criar o cartão.');
+  const stage = STAGES[horse.stage] || STAGES.training;
+  const name = horse.stage === 'creation'
+    ? [horse.father, horse.mother].filter(Boolean).join(' × ') || 'Cruza registrada'
+    : horse.name || 'Cavalo';
+
+  const background = context.createLinearGradient(0, 0, 1080, 1350);
+  background.addColorStop(0, '#173f30');
+  background.addColorStop(1, '#08241a');
+  context.fillStyle = background;
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.fillStyle = 'rgba(210,170,82,.12)';
+  context.beginPath();
+  context.arc(970, 120, 280, 0, Math.PI * 2);
+  context.fill();
+  context.strokeStyle = '#d2aa52';
+  context.lineWidth = 4;
+  context.strokeRect(48, 48, 984, canvas.height - 96);
+
+  context.fillStyle = '#efd183';
+  context.font = '700 30px Georgia, serif';
+  context.letterSpacing = '5px';
+  context.fillText('COCHEIRA RADAMÉS', 100, 135);
+  context.font = '700 25px Arial, sans-serif';
+  context.fillText(stage.title.toLocaleUpperCase('pt-BR'), 100, 215);
+  context.fillStyle = '#ffffff';
+  context.font = '700 66px Georgia, serif';
+  const nameLines = wrapCanvasText(context, name.toLocaleUpperCase('pt-BR'), 860).slice(0, 2);
+  let y = 310;
+  nameLines.forEach(line => { context.fillText(line, 100, y); y += 76; });
+  context.fillStyle = '#d2aa52';
+  context.fillRect(100, y + 8, 140, 5);
+  y += 80;
+
+  fields.forEach(([label, value], index) => {
+    const isNotes = label === 'Observações';
+    context.fillStyle = 'rgba(255,255,255,.075)';
+    const rowHeight = isNotes ? 150 : 94;
+    fillRoundedRect(context, 88, y - 42, 904, rowHeight, 16);
+    context.fillStyle = '#efd183';
+    context.font = '700 20px Arial, sans-serif';
+    context.fillText(label.toLocaleUpperCase('pt-BR'), 118, y - 5);
+    context.fillStyle = '#ffffff';
+    context.font = '600 30px Arial, sans-serif';
+    const lines = wrapCanvasText(context, value, 820).slice(0, isNotes ? 3 : 1);
+    lines.forEach((line, lineIndex) => context.fillText(line, 118, y + 37 + lineIndex * 34));
+    y += rowHeight + (index === fields.length - 1 ? 0 : 14);
+  });
+
+  context.fillStyle = '#b9c8c0';
+  context.font = '500 20px Arial, sans-serif';
+  context.fillText('Ficha compartilhada pela Cocheira RADAMÉS', 100, canvas.height - 90);
+  return canvasToBlob(canvas);
+}
+
+async function shareHorse(horse) {
+  const text = horseShareText(horse);
+  const image = await createHorseShareCard(horse);
+  const safeName = String(horse.name || 'cruza').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '').toLowerCase();
+  const file = new File([image], 'ficha-' + (safeName || 'cavalo') + '.png', { type: 'image/png' });
+  if (navigator.share && navigator.canShare?.({ files: [file] })) {
+    await navigator.share({ title: 'Ficha do cavalo', text, files: [file] });
+    return;
+  }
+  if (navigator.share) {
+    await navigator.share({ title: 'Ficha do cavalo', text });
+    return;
+  }
+  const imageUrl = URL.createObjectURL(image);
+  const download = document.createElement('a');
+  download.href = imageUrl;
+  download.download = file.name;
+  document.body.append(download);
+  download.click();
+  download.remove();
+  setTimeout(() => URL.revokeObjectURL(imageUrl), 1500);
+  window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank', 'noopener');
+  toast('Cartão salvo. No WhatsApp Web, anexe a imagem baixada à conversa.');
 }
 
 function render() {
@@ -1032,6 +1194,23 @@ $('#detailEdit').addEventListener('click', event => {
   const id = event.currentTarget.dataset.id;
   $('#horseDetailsModal').close();
   openEdit(id);
+});
+$('#detailShare').addEventListener('click', async event => {
+  const button = event.currentTarget;
+  const horse = state.horses.find(item => item.id === $('#detailEdit').dataset.id);
+  if (!horse) return toast('Não foi possível localizar este cadastro.', true);
+  const label = button.querySelector('span');
+  const original = label.textContent;
+  button.disabled = true;
+  label.textContent = 'Preparando cartão…';
+  try {
+    await shareHorse(horse);
+  } catch (shareError) {
+    if (shareError?.name !== 'AbortError') toast(shareError.message || 'Não foi possível compartilhar o cartão.', true);
+  } finally {
+    button.disabled = false;
+    label.textContent = original;
+  }
 });
 
 $('#addExpense').addEventListener('click', () => openExpenseForm());
