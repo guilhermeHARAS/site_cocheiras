@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=72">
+  <link rel="stylesheet" href="/styles.css?v=75">
 </head>
 <body>
   <svg class="ui-icon-sprite" aria-hidden="true">
@@ -271,11 +271,11 @@
         <span id="completionGuideText"></span>
       </div>
       <div class="form-grid">
-        <label class="field field--full"><span id="nameLabel">Nome do cavalo *</span><input id="name" maxlength="80"></label>
+        <label class="field field--full only-born"><span id="nameLabel">Nome do cavalo *</span><input id="name" maxlength="80"></label>
         <label class="field"><span>Nome do pai <b class="creation-required">*</b></span><input id="father" maxlength="80"></label>
         <label class="field"><span>Nome da mãe <b class="creation-required">*</b></span><input id="mother" maxlength="80"></label>
 
-        <label class="field field--full only-creation"><span>Data prevista de nascimento *</span><input id="expectedBirthDate" type="date"></label>
+        <label class="field field--full only-creation"><span>Data prevista de nascimento (opcional)</span><input id="expectedBirthDate" type="date"></label>
 
         <fieldset class="birth-fields field--full only-born">
           <legend>Nascimento</legend>
@@ -339,12 +339,12 @@
 
       <section class="capture-panel" data-panel="spreadsheet">
         <label class="upload-drop"><span>Selecione a planilha</span><small>Reconhece .xlsx e .csv, mesmo com nomes de colunas diferentes.</small><input id="spreadsheetFile" type="file" accept=".xlsx,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv"></label>
-        <p class="capture-tip">Exemplos reconhecidos: Cavalo/Animal/Nome, Pai/Garanhão, Mãe/Matriz, Nascimento, Idade, Etapa e Treinos.</p>
+        <p class="capture-tip" id="spreadsheetCaptureTip">Exemplos reconhecidos: Cavalo/Animal/Nome, Pai/Garanhão, Mãe/Matriz, Nascimento, Idade e Treinos.</p>
         <button class="button button--primary" id="analyzeSpreadsheet" type="button">Ler planilha</button>
       </section>
 
       <section class="capture-panel" data-panel="voice" hidden>
-        <p class="capture-tip">Exemplo: “Nome Relâmpago; pai Trovão; mãe Estrela; idade 3 anos; 12 treinos”.</p>
+        <p class="capture-tip" id="voiceCaptureTip">Exemplo: “Nome Relâmpago; pai Trovão; mãe Estrela; idade 3 anos; 12 treinos”.</p>
         <button class="button button--primary button--wide" id="startDictation" type="button"><svg class="ui-icon" aria-hidden="true"><use href="#ui-icon-microphone"></use></svg>Começar a falar</button>
         <label class="field"><span>Texto reconhecido</span><textarea id="voiceText" rows="5" placeholder="O que você disser aparecerá aqui para conferência."></textarea></label>
         <button class="button button--soft" id="analyzeVoice" type="button">Organizar dados falados</button>
@@ -359,7 +359,7 @@
 
       <section class="capture-panel" data-panel="text" hidden>
         <label class="field"><span>Anotações do Bloco de Notas</span><textarea id="notesImportText" rows="7" placeholder="Persa&#10;Duelo x Leide&#10;3 anos&#10;&#10;Estrela&#10;Trovão x Lua"></textarea></label>
-        <p class="capture-tip">Linhas seguidas podem completar o mesmo cavalo. Deixe uma linha em branco para começar outro animal.</p>
+        <p class="capture-tip" id="notesCaptureTip">Linhas seguidas podem completar o mesmo cavalo. Deixe uma linha em branco para começar outro animal.</p>
         <label class="field capture-file"><span>Ou selecione um arquivo .txt</span><input id="notesFile" type="file" accept=".txt,text/plain"></label>
         <button class="button button--primary" id="analyzeNotes" type="button">Organizar anotações</button>
       </section>
@@ -445,6 +445,6 @@
 
   <div class="toasts" id="toasts" aria-live="polite"></div>
   <div class="confetti" id="confetti"></div>
-  <script type="module" src="/app.js?v=74"></script>
+  <script type="module" src="/app.js?v=75"></script>
 </body>
 </html>

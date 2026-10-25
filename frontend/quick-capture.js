@@ -26,10 +26,6 @@ function field(label, name, value, type = 'text', extra = '') {
   return `<label class="field"><span>${label}</span><input data-field="${name}" type="${type}" value="${escapeHtml(value ?? '')}" ${extra}></label>`;
 }
 
-function stageOptions(selected) {
-  return Object.entries(STAGE_LABELS).map(([value, label]) => `<option value="${value}" ${value === selected ? 'selected' : ''}>${label}</option>`).join('');
-}
-
 export function initializeQuickCapture({ api, getStage, reload, toast }) {
   let preview = [];
   let documentUrl = '';
@@ -55,26 +51,29 @@ export function initializeQuickCapture({ api, getStage, reload, toast }) {
     $('#importRecords').innerHTML = preview.map((record, index) => {
       const alerts = [...(record.issues || [])];
       if (record.duplicate) alerts.push(`Possível duplicado de “${record.duplicate}”`);
+      const stage = record.stage || getStage() || 'training';
+      const identityFields = stage === 'creation'
+        ? field('Pai', 'father', record.father, 'text', 'maxlength="80"') + field('Mãe', 'mother', record.mother, 'text', 'maxlength="80"')
+        : field('Nome', 'name', record.name, 'text', 'maxlength="80"') + field('Pai', 'father', record.father, 'text', 'maxlength="80"') + field('Mãe', 'mother', record.mother, 'text', 'maxlength="80"');
+      const bornFields = stage === 'creation' ? '' : [
+        field('Nascimento', 'birthDate', record.birthDate, 'date'),
+        field('Idade em anos', 'age', record.age, 'number', 'min="0" max="60"'),
+        field('Raça', 'breed', record.breed, 'text', 'maxlength="80"'),
+        field('Sexo', 'sex', record.sex, 'text', 'maxlength="20"'),
+        field('Proprietário', 'owner', record.owner, 'text', 'maxlength="100"'),
+        field('Localização', 'location', record.location, 'text', 'maxlength="120"'),
+        '<label class="field field--wide"><span>Observações</span><textarea data-field="notes" maxlength="600">' + escapeHtml(record.notes || '') + '</textarea></label>',
+      ].join('');
+      const creationFields = stage === 'creation' ? field('Previsão de nascimento (opcional)', 'expectedBirthDate', record.expectedBirthDate, 'date') : '';
+      const trainingFields = stage === 'training' ? field('Treinos', 'workouts', record.workouts, 'number', 'min="0"') : '';
       return `<article class="import-record ${alerts.length ? 'needs-review' : ''}" data-index="${index}">
         <div class="import-record__head">
           <label class="import-select"><input data-select type="checkbox" ${record.selected ? 'checked' : ''}><span>Importar</span></label>
-          <span class="import-origin">${escapeHtml(record.importOrigin || '')}</span>
+          <span class="import-origin">${escapeHtml(STAGE_LABELS[stage])} · ${escapeHtml(record.importOrigin || '')}</span>
         </div>
         ${alerts.length ? `<p class="import-alert">${escapeHtml(alerts.join(' · '))}</p>` : ''}
         <div class="import-record__grid">
-          ${field('Nome', 'name', record.name, 'text', 'maxlength="80"')}
-          <label class="field"><span>Etapa</span><select data-field="stage">${stageOptions(record.stage)}</select></label>
-          ${field('Pai', 'father', record.father, 'text', 'maxlength="80"')}
-          ${field('Mãe', 'mother', record.mother, 'text', 'maxlength="80"')}
-          ${field('Nascimento', 'birthDate', record.birthDate, 'date')}
-          ${field('Idade em anos', 'age', record.age, 'number', 'min="0" max="60"')}
-          ${field('Previsão de nascimento', 'expectedBirthDate', record.expectedBirthDate, 'date')}
-          ${field('Treinos', 'workouts', record.workouts, 'number', 'min="0"')}
-          ${field('Raça', 'breed', record.breed, 'text', 'maxlength="80"')}
-          ${field('Sexo', 'sex', record.sex, 'text', 'maxlength="20"')}
-          ${field('Proprietário', 'owner', record.owner, 'text', 'maxlength="100"')}
-          ${field('Localização', 'location', record.location, 'text', 'maxlength="120"')}
-          <label class="field field--wide"><span>Observações</span><textarea data-field="notes" maxlength="600">${escapeHtml(record.notes || '')}</textarea></label>
+          ${identityFields}${creationFields}${bornFields}${trainingFields}
         </div>
         ${record.duplicate ? '<label class="duplicate-override"><input data-allow-duplicate type="checkbox"> Confirmo que é outro animal com dados semelhantes</label>' : ''}
       </article>`;
@@ -97,6 +96,17 @@ export function initializeQuickCapture({ api, getStage, reload, toast }) {
   }
 
   $('#openQuickCapture').addEventListener('click', () => {
+    const creation = getStage() === 'creation';
+    $('#spreadsheetCaptureTip').textContent = creation
+      ? 'Na Reprodução, use as colunas Pai e Mãe. A previsão de nascimento é opcional.'
+      : 'Reconhece Nome, Pai, Mãe, Nascimento ou Idade e os campos disponíveis nesta área.';
+    $('#voiceCaptureTip').textContent = creation
+      ? 'Exemplo: “Drink cruzado com Juíza”. Cada cruza será organizada separadamente.'
+      : 'Exemplo: “Nome Relâmpago; pai Trovão; mãe Estrela; idade 3 anos”.';
+    $('#notesCaptureTip').textContent = creation
+      ? 'Use uma cruza por linha: Drink x Juíza. Também entende ×, “com”, “cruzado com” e “Pai: …; Mãe: …”.'
+      : 'Linhas seguidas podem completar o mesmo cavalo. Deixe uma linha em branco para começar outro animal.';
+    $('#notesImportText').placeholder = creation ? 'Drink x Juíza\nTrovão × Lua\nRelâmpago cruzado com Estrela' : 'Persa\nDuelo x Leide\n3 anos\n\nEstrela\nTrovão x Lua';
     selectMethod('spreadsheet');
     $('#captureError').textContent = '';
     captureModal.showModal();
@@ -193,7 +203,7 @@ export function initializeQuickCapture({ api, getStage, reload, toast }) {
       const value = name => card.querySelector(`[data-field="${name}"]`)?.value ?? '';
       return {
         ...original,
-        name: value('name').trim(), stage: value('stage'), father: value('father').trim(), mother: value('mother').trim(),
+        name: value('name').trim(), stage: original.stage || getStage() || 'training', father: value('father').trim(), mother: value('mother').trim(),
         birthDate: value('birthDate') || null, age: value('age'), expectedBirthDate: value('expectedBirthDate') || null,
         workouts: value('workouts'), breed: value('breed').trim(), sex: value('sex').trim(), owner: value('owner').trim(), location: value('location').trim(), notes: value('notes').trim(),
         allowDuplicate: Boolean(card.querySelector('[data-allow-duplicate]')?.checked),

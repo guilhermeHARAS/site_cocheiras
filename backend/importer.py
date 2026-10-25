@@ -101,7 +101,9 @@ def _stage(value: Any, default_stage: str) -> str:
 
 
 def _record(values: dict[str, Any], default_stage: str, *, origin: str, extra: dict[str, Any] | None = None) -> dict[str, Any]:
-    stage = _stage(values.get("stage"), default_stage)
+    # O cadastro rápido pertence à área em que foi aberto. Uma coluna "Etapa"
+    # não pode transformar silenciosamente uma cruza em cavalo de treinamento.
+    stage = _stage(default_stage, "training")
     record = {
         "stage": stage,
         "name": _text(values.get("name"), 80),
@@ -132,8 +134,6 @@ def _with_issues(record: dict[str, Any]) -> dict[str, Any]:
             issues.append("Informe o pai")
         if not record["mother"]:
             issues.append("Informe a mãe")
-        if not record["expectedBirthDate"]:
-            issues.append("Informe a previsão de nascimento")
     else:
         if not record["name"]:
             issues.append("Informe o nome")
@@ -247,7 +247,8 @@ def parse_spreadsheet(filename: str, content_base64: str, default_stage: str) ->
         records.extend(parsed)
         warnings.extend(sheet_warnings)
     if not records:
-        raise ValueError("Nenhum cadastro foi encontrado. Use uma coluna Nome, Cavalo ou Animal.")
+        hint = "Pai e Mãe" if default_stage == "creation" else "Nome, Cavalo ou Animal"
+        raise ValueError(f"Nenhum cadastro foi encontrado. Use colunas {hint}.")
     if len(records) >= MAX_IMPORT_ROWS:
         warnings.append(f"Foram lidas somente as primeiras {MAX_IMPORT_ROWS} linhas.")
     return {"records": records[:MAX_IMPORT_ROWS], "warnings": warnings}
@@ -303,8 +304,43 @@ def _parse_simple_line(line: str) -> dict[str, Any]:
 
 
 def _pedigree(line: str) -> tuple[str, str] | None:
-    match = re.fullmatch(r"\s*(.+?)\s*[x×]\s*(.+?)\s*", line, re.IGNORECASE)
-    return (match.group(1).strip(), match.group(2).strip()) if match else None
+    patterns = (
+        (r"\s*(.+?)\s+(?:x|×|&|cruzad[oa]\s+com|com)\s+(.+?)\s*", re.IGNORECASE),
+        (r"\s*(.+?)\s*[×&]\s*(.+?)\s*", 0),
+        # Também aceita a escrita compacta DueloXLeide sem confundir o x de Alex.
+        (r"\s*(.+?)X(?=[A-ZÁÉÍÓÚÂÊÔÃÕÇ])(.+?)\s*", 0),
+    )
+    for pattern, flags in patterns:
+        match = re.fullmatch(pattern, line, flags)
+        if match:
+            return match.group(1).strip(), match.group(2).strip()
+    return None
+
+
+def _creation_values(text: str) -> list[dict[str, Any]]:
+    """Lê cruzas sem exigir um nome de animal ainda não nascido.
+
+    Uma linha com ``Pai x Mãe`` representa uma cruza independente. Blocos
+    rotulados (Pai/Mãe/Previsão) continuam podendo ocupar várias linhas.
+    """
+    values: list[dict[str, Any]] = []
+    blocks = [part.strip() for part in re.split(r"\n\s*\n|\n\s*-{3,}\s*\n", text) if part.strip()]
+    for block in blocks:
+        lines = [re.sub(r"^\s*(?:[-*•]|\d+[.)])\s*", "", line).strip() for line in block.splitlines() if line.strip()]
+        labeled = _parse_text_block(block) if LABEL_PATTERN.search(block) else {}
+        if labeled.get("father") or labeled.get("mother"):
+            values.append(labeled)
+            continue
+        for line in lines:
+            expected = None
+            cross_text = line
+            dated = re.fullmatch(r"(.+?)\s*(?:[;|]|\s[-–—]\s)\s*(\d{1,2}[/.\-]\d{1,2}[/.\-]\d{2,4})\s*", line)
+            if dated:
+                cross_text, expected = dated.group(1), _date_value(dated.group(2))
+            parents = _pedigree(cross_text)
+            if parents:
+                values.append({"father": parents[0], "mother": parents[1], "expectedBirthDate": expected})
+    return values
 
 
 def _unstructured_block(block: str) -> list[dict[str, Any]]:
@@ -368,7 +404,9 @@ def parse_notes(text: str, default_stage: str, origin: str = "Anotações") -> d
     clean = str(text or "").replace("\r\n", "\n").strip()
     if not clean:
         raise ValueError("Cole ou dite alguma informação antes de continuar.")
-    if LABEL_PATTERN.search(clean):
+    if default_stage == "creation":
+        values = _creation_values(clean)
+    elif LABEL_PATTERN.search(clean):
         # Um novo Nome/Cavalo no início da linha inicia outro cadastro, mesmo sem linha em branco.
         clean = re.sub(r"(?im)(?<!\A)^(?=\s*(?:nome(?: do cavalo)?|cavalo|animal)\s*[:=\-])", "\n\n", clean)
         blocks = [part.strip() for part in re.split(r"\n\s*\n|\n\s*-{3,}\s*\n", clean) if part.strip()]
@@ -380,13 +418,16 @@ def parse_notes(text: str, default_stage: str, origin: str = "Anotações") -> d
             values.extend(_unstructured_block(block))
     records = []
     for index, value in enumerate(values, 1):
-        if not value.get("name"):
+        has_identity = value.get("name") or default_stage == "creation" and value.get("father") and value.get("mother")
+        if not has_identity:
             continue
         record = _record(value, default_stage, origin=f"{origin}, bloco {index}")
         if value.get("_warning"):
             record["issues"].append(value["_warning"])
         records.append(record)
     if not records:
+        if default_stage == "creation":
+            raise ValueError("Nenhuma cruza foi encontrada. Use uma linha para cada cruza, por exemplo: Drink x Juíza.")
         raise ValueError("Nenhum nome de cavalo foi encontrado.")
     return {"records": records[:MAX_IMPORT_ROWS], "warnings": []}
 

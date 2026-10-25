@@ -11,6 +11,23 @@ from importer import duplicate_of, parse_notes, parse_spreadsheet
 
 
 class NotesImportTests(unittest.TestCase):
+    def test_reproduction_reads_one_cross_per_line_without_expected_name_or_date(self):
+        records = parse_notes(
+            "Drink x Juíza\nTrovão × Lua\nRelâmpago cruzado com Estrela\nVento com Aurora",
+            "creation",
+        )["records"]
+        self.assertEqual(len(records), 4)
+        self.assertEqual([(item["father"], item["mother"]) for item in records], [
+            ("Drink", "Juíza"), ("Trovão", "Lua"), ("Relâmpago", "Estrela"), ("Vento", "Aurora"),
+        ])
+        self.assertTrue(all(item["name"] == "" and item["expectedBirthDate"] is None for item in records))
+        self.assertTrue(all(item["issues"] == [] for item in records))
+
+    def test_reproduction_reads_labeled_parents_and_optional_forecast(self):
+        record = parse_notes("Pai: Drink\nMãe: Juíza\nPrevisão: 10/12/2027", "creation")["records"][0]
+        self.assertEqual((record["father"], record["mother"]), ("Drink", "Juíza"))
+        self.assertEqual(record["expectedBirthDate"], "2027-12-10")
+
     def test_reads_labeled_notepad_records(self):
         result = parse_notes(
             "Nome: Relâmpago\nPai: Trovão\nMãe: Estrela\nIdade: 3\nTreinos: 12\n\n"
@@ -81,7 +98,7 @@ class SpreadsheetImportTests(unittest.TestCase):
         record = result["records"][0]
         self.assertEqual(record["name"], "Flecha")
         self.assertEqual(record["father"], "Trovão")
-        self.assertEqual(record["stage"], "ready")
+        self.assertEqual(record["stage"], "training")
         self.assertEqual(record["workouts"], 61)
 
     def test_reads_location_from_spreadsheet(self):

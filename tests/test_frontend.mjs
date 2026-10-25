@@ -131,11 +131,24 @@ test('cruzas usam cartões compactos com hierarquia de agenda', () => {
   assert.match(app, /creation-card__label/);
   assert.match(app, /creation-card__pair/);
   assert.match(app, /Registrar nascimento/);
-  assert.match(app, /creation-card__name/);
+  assert.doesNotMatch(app, /Nome previsto/);
   assert.match(app, /horse-grid--creation/);
   assert.match(styles, /\.horse-grid--creation/);
   assert.match(styles, /\.creation-card::before/);
   assert.match(styles, /\.creation-card__pair/);
+});
+
+test('reprodução simplificada, transferência permanece na etapa e celular não aplica zoom nos campos', () => {
+  const html = readFileSync(`${root}/frontend/index.html`, 'utf8');
+  const app = readFileSync(`${root}/frontend/app.js`, 'utf8');
+  const capture = readFileSync(`${root}/frontend/quick-capture.js`, 'utf8');
+  const styles = readFileSync(`${root}/frontend/styles.css`, 'utf8');
+  assert.match(html, /Data prevista de nascimento \(opcional\)/);
+  assert.match(html, /class="field field--full only-born"/);
+  assert.doesNotMatch(app, /state\.stage = '(?:foals|training|ready)'/);
+  assert.match(capture, /Previsão de nascimento \(opcional\)/);
+  assert.match(capture, /Drink x Juíza/);
+  assert.match(styles, /input,select,textarea\{font-size:16px!important\}/);
 });
 
 test('contadores das etapas explicam que representam quantidades', () => {

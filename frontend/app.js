@@ -347,13 +347,11 @@ function commonActions(horse) {
 function creationCard(horse) {
   const father = escapeHtml(horse.father || 'Não informado');
   const mother = escapeHtml(horse.mother || 'Não informada');
-  const expectedName = escapeHtml(horse.name || 'Ainda não definido');
   return [
-    '<article class="horse-card creation-card" data-horse-id="', horse.id, '" role="button" tabindex="0" aria-label="Abrir ficha de ', escapeHtml(horse.name || 'cruza'), '">',
-    '<div class="creation-card__date"><div class="creation-card__date-label">', uiIcon('calendar'), '<span>Previsão de nascimento</span></div><strong>', formatDate(horse.expectedBirthDate), '</strong></div>',
+    '<article class="horse-card creation-card" data-horse-id="', horse.id, '" role="button" tabindex="0" aria-label="Abrir ficha da cruza">',
+    '<div class="creation-card__date"><div class="creation-card__date-label">', uiIcon('calendar'), '<span>Previsão de nascimento</span></div><strong>', formatDate(horse.expectedBirthDate, 'Sem previsão'), '</strong></div>',
     '<div class="horse-card__body"><span class="creation-card__label">CRUZAMENTO</span>',
     '<div class="creation-card__pair"><div><span>PAI</span><strong>', father, '</strong></div><div><span>MÃE</span><strong>', mother, '</strong></div></div>',
-    '<div class="creation-card__name"><span>Nome previsto</span><strong class="', horse.name ? '' : 'is-pending', '">', expectedName, '</strong></div>',
     '<button class="button button--primary" data-action="born" data-id="', horse.id, '">Registrar nascimento</button>',
     commonActions(horse), '</div></article>',
   ].join('');
@@ -446,13 +444,13 @@ function openHorseDetails(horse) {
   const workouts = Number(horse.workouts) || 0;
   const percentage = Math.min(100, Math.max(0, Math.round((workouts / GOAL) * 100)));
   $('#detailEyebrow').textContent = stage.title.toUpperCase();
-  $('#detailName').textContent = horse.name || (isCreation ? 'Nome ainda não definido' : 'Cavalo');
+  $('#detailName').textContent = isCreation ? 'Cruza registrada' : (horse.name || 'Cavalo');
   $('#detailEdit').dataset.id = horse.id;
   const pedigreeItems = optionalDetailItem('Pai', horse.father) + optionalDetailItem('Mãe', horse.mother);
   const pedigree = pedigreeItems ? '<section class="horse-detail-pedigree"><p>FILIAÇÃO</p><div>' + pedigreeItems + '</div></section>' : '';
   const hasAge = Boolean(horse.birthDate) || horse.age !== null && horse.age !== undefined && horse.age !== '';
   const dates = isCreation
-    ? detailItem('Nascimento previsto', formatDate(horse.expectedBirthDate), true)
+    ? optionalDetailItem('Nascimento previsto', horse.expectedBirthDate ? formatDate(horse.expectedBirthDate) : '', true)
     : optionalDetailItem('Nascimento', horse.birthDate ? formatDate(horse.birthDate) : '') + optionalDetailItem('Idade atual', hasAge ? ageLabel(horse) : '');
   const summaryItems = dates + optionalDetailItem('Raça', horse.breed) + optionalDetailItem('Sexo', horse.sex) +
     optionalDetailItem('Proprietário', horse.owner) + (isCreation ? '' : optionalDetailItem('Localização atual', horse.location));
@@ -491,6 +489,14 @@ function render() {
   $('#horseGrid').classList.toggle('horse-grid--ready', state.stage === 'ready');
   const query = state.query.trim().toLocaleLowerCase('pt-BR');
   let list = state.horses.filter(horse => horse.stage === state.stage && [horse.name, horse.father, horse.mother, horse.owner, horse.location].some(value => String(value || '').toLocaleLowerCase('pt-BR').includes(query)));
+  if (state.stage === 'creation') {
+    list.sort((a, b) => {
+      if (a.expectedBirthDate && b.expectedBirthDate) return a.expectedBirthDate.localeCompare(b.expectedBirthDate);
+      if (a.expectedBirthDate) return -1;
+      if (b.expectedBirthDate) return 1;
+      return String(a.father || '').localeCompare(String(b.father || ''), 'pt-BR', { sensitivity: 'base' });
+    });
+  }
   const currentYear = new Date().getFullYear();
   const ageInMonths = horse => {
     if (horse.birthDate) {
@@ -502,7 +508,7 @@ function render() {
     const recordedYear = Number(String(horse.ageRecordedAt || '').slice(0, 4)) || currentYear;
     return (Number(horse.age) + Math.max(0, currentYear - recordedYear)) * 12;
   };
-  list.sort((a, b) => {
+  if (state.stage !== 'creation') list.sort((a, b) => {
     const byName = String(a.name || 'Nome a definir').localeCompare(String(b.name || 'Nome a definir'), 'pt-BR', { sensitivity: 'base', numeric: true });
     if (byName) return byName;
     const ageA = ageInMonths(a);
@@ -614,7 +620,7 @@ function configureForm(stage, editing = false) {
   $('#horseModal').dataset.stage = stage;
   $('#modalEyebrow').textContent = STAGES[stage].title.toUpperCase();
   $('#modalTitle').textContent = editing ? 'Editar cadastro' : STAGES[stage].add;
-  $('#nameLabel').textContent = stage === 'creation' ? 'Nome previsto do cavalo (opcional)' : 'Nome do cavalo *';
+  $('#nameLabel').textContent = 'Nome do cavalo *';
   document.querySelectorAll('.creation-required').forEach(item => item.hidden = stage !== 'creation');
 }
 
@@ -902,7 +908,7 @@ $('#horseForm').addEventListener('submit', async event => {
   const duplicate = state.horses.find(horse => horse.id !== state.editing && name && horse.name.trim().toLocaleLowerCase('pt-BR') === name.toLocaleLowerCase('pt-BR'));
   $('#horseError').textContent = '';
   if (stage !== 'creation' && !name) return void ($('#horseError').textContent = 'Informe o nome do cavalo.');
-  if (stage === 'creation' && (!$('#father').value.trim() || !$('#mother').value.trim() || !$('#expectedBirthDate').value)) return void ($('#horseError').textContent = 'Informe pai, mãe e data prevista.');
+  if (stage === 'creation' && (!$('#father').value.trim() || !$('#mother').value.trim())) return void ($('#horseError').textContent = 'Informe o nome do pai e da mãe.');
   const persistHorse = async () => {
     saveButton.disabled = true;
     saveButton.textContent = 'Salvando…';
@@ -960,7 +966,6 @@ $('#bornForm').addEventListener('submit', async event => {
   try {
     await api.transition(id, 'foals', { birthDate, name: $('#bornName').value.trim() });
     $('#bornModal').close();
-    state.stage = 'foals';
     await loadHorses();
     toast('Nascimento confirmado. O animal foi enviado para Potros e Desenvolvimento.');
   } catch (error) {
@@ -990,13 +995,11 @@ $('#horseGrid').addEventListener('click', async event => {
   }, true);
   if (action === 'to-training') return ask('Iniciar treinamento', 'Deseja mover ' + horse.name + ' para Preparação e Treinamento?', async () => {
     await api.transition(horse.id, 'training');
-    state.stage = 'training';
     await loadHorses();
     toast(horse.name + ' foi enviado para treinamento.');
   });
   if (action === 'to-ready') return ask('Enviar para tropa pronta', 'Confirma que ' + horse.name + ' está pronto para torneio?', async () => {
     await api.transition(horse.id, 'ready');
-    state.stage = 'ready';
     await loadHorses();
     celebrate();
     toast(horse.name + ' agora faz parte da Tropa pronta.');

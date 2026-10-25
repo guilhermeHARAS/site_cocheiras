@@ -121,13 +121,10 @@ body{font-size:calc(15px * var(--font-scale))}
 .creation-card .horse-card__body{padding:12px 13px 8px 17px}
 .creation-card__label{display:block;margin-bottom:3px;color:#9a742a;font-size:7px;font-weight:850;letter-spacing:.15em}
 .creation-card__cross{min-height:0;margin:0 0 10px;color:var(--forest);font:700 16px/1.25 var(--display)}
-.creation-card__name{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:11px;border-top:1px solid #ebe6db;padding-top:8px}
-.creation-card__name span{color:var(--muted);font-size:8px}
-.creation-card__name strong{color:#76581e;font-size:10px;font-weight:750;text-align:right;overflow-wrap:anywhere}
 .creation-card .button{min-height:34px;border-radius:8px;font-size:9px}
 .creation-card .card-actions{margin-top:7px;padding-top:3px}
 .creation-card .card-actions button{padding:3px 2px;font-size:8px}
-@media(max-width:620px){.horse-grid--creation{grid-template-columns:1fr}.creation-card__date{padding:9px 11px 8px 15px}.creation-card .horse-card__body{padding:11px 11px 7px 15px}.creation-card__cross{font-size:15px}.creation-card__name{margin-bottom:9px}}
+@media(max-width:620px){.horse-grid--creation{grid-template-columns:1fr}.creation-card__date{padding:9px 11px 8px 15px}.creation-card .horse-card__body{padding:11px 11px 7px 15px}.creation-card__cross{font-size:15px}}
 
 /* Indicadores da tela inicial: etapa discreta e quantidade identificada. */
 .stage-menu .stage-card__step{color:#afa99d;font-size:8px;font-weight:750;letter-spacing:.2em;opacity:.72}
@@ -207,19 +204,19 @@ body{font-size:calc(15px * var(--font-scale))}
 .creation-card__date{position:relative;z-index:1;flex-direction:column;align-items:flex-start;justify-content:center;border-right:1px solid #e5dfd2;border-bottom:0;padding:18px;background:linear-gradient(135deg,#f4e9ca,#fffaf0)}
 .creation-card__date-label{display:flex;align-items:center;gap:7px}.creation-card__date-label .ui-icon{width:16px;height:16px;color:#967027}
 .creation-card__date strong{margin-top:12px;padding:7px 11px;font-size:14px}
-.creation-card .horse-card__body{position:relative;z-index:1;display:grid;grid-template-columns:minmax(200px,1.25fr) minmax(110px,.65fr) minmax(125px,.55fr);grid-template-areas:"label label label" "pair name born" "actions actions actions";align-items:stretch;gap:8px;padding:14px 12px 8px}
+.creation-card .horse-card__body{position:relative;z-index:1;display:grid;grid-template-columns:minmax(240px,1fr) minmax(145px,.42fr);grid-template-areas:"label label" "pair born" "actions actions";align-items:stretch;gap:8px;padding:14px 12px 8px}
 .creation-card__label{grid-area:label;margin:0}
 .creation-card__pair{grid-area:pair;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:stretch;margin:0}
 .creation-card__pair>div{min-width:0;border:1px solid #e8dfc8;background:rgba(255,255,255,.86);padding:10px 11px}
 .creation-card__pair>div:first-child{border-radius:10px 0 0 10px}.creation-card__pair>div:last-child{border-radius:0 10px 10px 0;border-left:0}
 .creation-card__pair span{display:block;margin-bottom:4px;color:#9a742a;font-size:7px;font-weight:850;letter-spacing:.14em}
 .creation-card__pair strong{display:block;color:var(--forest);font:700 15px/1.2 var(--display);overflow-wrap:anywhere}
-.creation-card__name{grid-area:name;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;border:1px solid #ece4d1;border-radius:9px;background:#fff;padding:9px 12px;margin:0}
-.creation-card__name span{font-size:7px;font-weight:750;letter-spacing:.08em;text-transform:uppercase}.creation-card__name strong{color:var(--forest);font:700 13px/1.2 var(--display)}
-.creation-card__name strong.is-pending{color:#8a806b;font-size:10px;font-style:italic;font-weight:600}
 .creation-card>.horse-card__body>.button--primary{grid-area:born;align-self:stretch;margin:0;letter-spacing:.02em}
 .creation-card .card-actions{grid-area:actions;margin:0;padding-top:5px}
-@media(max-width:620px){.creation-card{grid-template-columns:1fr}.creation-card__date{flex-direction:row;align-items:center;justify-content:space-between;border-right:0;border-bottom:1px solid #e5dfd2;padding:10px 13px 9px 17px}.creation-card__date strong{margin:0;padding:5px 9px;font-size:11px}.creation-card .horse-card__body{grid-template-columns:1fr;grid-template-areas:"label" "pair" "name" "born" "actions";padding:13px 13px 8px 17px}.creation-card__pair strong{font-size:14px}}
+@media(max-width:620px){.creation-card{grid-template-columns:1fr}.creation-card__date{flex-direction:row;align-items:center;justify-content:space-between;border-right:0;border-bottom:1px solid #e5dfd2;padding:10px 13px 9px 17px}.creation-card__date strong{margin:0;padding:5px 9px;font-size:11px}.creation-card .horse-card__body{grid-template-columns:1fr;grid-template-areas:"label" "pair" "born" "actions";padding:13px 13px 8px 17px}.creation-card__pair strong{font-size:14px}}
+
+/* Evita o zoom automático do iPhone ao focar campos pequenos e o zoom por toque duplo. */
+@media(max-width:620px){input,select,textarea{font-size:16px!important}button,.button,[role="button"]{touch-action:manipulation}html,body{max-width:100%;overflow-x:hidden}}
 
 /* Nomes dos animais: destaque consistente sem alterar o valor salvo. */
 .horse-identity__name h2{text-transform:uppercase;letter-spacing:.025em}
@@ -241,7 +238,6 @@ body{font-size:calc(15px * var(--font-scale))}
 .creation-card__date strong,
 .creation-card__label,
 .creation-card__pair,
-.creation-card__name{text-transform:uppercase}
 
 /* Ações principais reunidas no canto inferior direito. */
 .floating-tools{position:fixed;right:18px;bottom:18px;z-index:20;display:grid;justify-items:end;gap:8px}

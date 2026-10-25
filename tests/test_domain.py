@@ -63,6 +63,12 @@ class MigrationTests(unittest.TestCase):
 
 
 class LifecycleTests(unittest.TestCase):
+    def test_creation_needs_only_parents_and_keeps_forecast_optional(self):
+        horse = validate_horse({"stage": "creation", "father": "Drink", "mother": "Juíza"}, stage="creation")
+        self.assertEqual((horse["father"], horse["mother"]), ("Drink", "Juíza"))
+        self.assertEqual(horse["name"], "")
+        self.assertIsNone(horse["expectedBirthDate"])
+
     def test_born_horse_can_be_saved_with_name_only(self):
         horse = validate_horse({"stage": "foals", "name": "Sem idade"}, stage="foals")
         self.assertEqual(horse["name"], "Sem idade")

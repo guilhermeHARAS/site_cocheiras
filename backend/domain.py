@@ -221,8 +221,6 @@ def validate_horse(
         if not father or not mother:
             raise ValueError("Informe o nome do pai e da mãe.")
         expected = _valid_iso_date(payload.get("expectedBirthDate", current.get("expectedBirthDate")))
-        if not expected:
-            raise ValueError("Informe a data prevista de nascimento.")
     else:
         expected = _valid_iso_date(payload.get("expectedBirthDate", current.get("expectedBirthDate")))
         if not name:
