@@ -378,6 +378,9 @@ body{font-size:calc(15px * var(--font-scale))}
 .horse-details[open]{display:flex;flex-direction:column;width:min(720px,calc(100% - 24px));height:fit-content!important;min-height:0!important;max-height:92dvh;overflow:hidden}
 .horse-details>.modal__head,.horse-details__actions{flex:0 0 auto}
 .horse-details__body{flex:0 1 auto;min-height:0;max-height:none;overflow-y:auto;overscroll-behavior:contain}
+.horse-details__body{grid-auto-flow:row;grid-auto-rows:max-content;align-content:start}
+.horse-details__body>*{grid-column:1;min-width:0;position:relative}
+.horse-detail-pedigree,.horse-detail-missing{height:auto;min-height:0}
 .horse-details__actions{position:relative;z-index:5;margin:0;padding-bottom:max(13px,env(safe-area-inset-bottom));box-shadow:0 -10px 24px rgba(2,18,12,.2)}
 
 /* Arquivos sempre permanecem dentro do quadro de Cadastro rápido. */
@@ -391,6 +394,9 @@ body{font-size:calc(15px * var(--font-scale))}
 @media(max-width:620px){
   .horse-details[open]{width:calc(100% - 12px);height:fit-content!important;min-height:0!important;max-height:calc(100dvh - 12px);margin:6px auto}
   .horse-details__body{padding:12px}
+  .horse-detail-missing{display:grid;grid-template-columns:minmax(0,1fr);align-items:start;gap:10px;overflow:visible}
+  .horse-detail-missing>div{min-width:0}
+  .horse-detail-missing p{line-height:1.45;overflow-wrap:anywhere}
   .horse-details__actions{padding:9px 10px max(9px,env(safe-area-inset-bottom))}
   .quick-capture[open]{width:calc(100% - 12px);height:calc(100dvh - 12px);max-height:calc(100dvh - 12px);margin:6px auto}
   .quick-capture__body{padding:12px}

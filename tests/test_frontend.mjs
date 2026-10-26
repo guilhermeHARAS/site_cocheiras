@@ -277,9 +277,12 @@ test('ficha gera cartão em PNG e compartilha pelo WhatsApp', () => {
 test('ficha mantém ações visíveis e arquivos não escapam do cadastro rápido', () => {
   const html = readFileSync(`${root}/frontend/index.html`, 'utf8');
   const styles = readFileSync(`${root}/frontend/styles.css`, 'utf8');
-  assert.match(html, /styles\.css\?v=84/);
+  assert.match(html, /styles\.css\?v=85/);
   assert.match(styles, /\.horse-details\[open\]\{display:flex;flex-direction:column/);
   assert.match(styles, /\.horse-details__body\{flex:0 1 auto;min-height:0;max-height:none;overflow-y:auto/);
+  assert.match(styles, /\.horse-details__body\{grid-auto-flow:row;grid-auto-rows:max-content;align-content:start\}/);
+  assert.match(styles, /\.horse-details__body>\*\{grid-column:1;min-width:0;position:relative\}/);
+  assert.match(styles, /\.horse-detail-missing\{display:grid;grid-template-columns:minmax\(0,1fr\);align-items:start;gap:10px;overflow:visible\}/);
   assert.match(styles, /\.horse-details__actions\{position:relative;z-index:5/);
   assert.match(styles, /\.quick-capture\[open\]\{display:flex;flex-direction:column/);
   assert.match(styles, /\.upload-drop input\[type="file"\],\.capture-file input\[type="file"\]\{[^}]*width:100%/);
