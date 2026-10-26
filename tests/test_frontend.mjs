@@ -112,6 +112,20 @@ test('cavalos são ordenados por nome e depois por idade', () => {
   assert.match(app, /return ageB - ageA/);
 });
 
+test('cartões permitem voltar etapa e controles de treino têm textos claros', () => {
+  const app = readFileSync(`${root}/frontend/app.js`, 'utf8');
+  assert.match(app, /data-action="previous-stage"/);
+  assert.match(app, />Voltar etapa</);
+  assert.match(app, />Descontar treino</);
+  assert.match(app, />Somar treino</);
+  assert.match(app, /Todos os dados e treinos serão preservados/);
+});
+
+test('ficha detalhada não repete a etapa em uma etiqueta arredondada', () => {
+  const app = readFileSync(`${root}/frontend/app.js`, 'utf8');
+  assert.doesNotMatch(app, /class="horse-detail-stage"/);
+});
+
 test('assistente oferece memória, voz e downloads de relatório', () => {
   const app = readFileSync(`${root}/frontend/app.js`, 'utf8');
   const html = readFileSync(`${root}/frontend/index.html`, 'utf8');
@@ -263,9 +277,9 @@ test('ficha gera cartão em PNG e compartilha pelo WhatsApp', () => {
 test('ficha mantém ações visíveis e arquivos não escapam do cadastro rápido', () => {
   const html = readFileSync(`${root}/frontend/index.html`, 'utf8');
   const styles = readFileSync(`${root}/frontend/styles.css`, 'utf8');
-  assert.match(html, /styles\.css\?v=80/);
+  assert.match(html, /styles\.css\?v=84/);
   assert.match(styles, /\.horse-details\[open\]\{display:flex;flex-direction:column/);
-  assert.match(styles, /\.horse-details__body\{flex:1 1 auto;min-height:0;max-height:none;overflow-y:auto/);
+  assert.match(styles, /\.horse-details__body\{flex:0 1 auto;min-height:0;max-height:none;overflow-y:auto/);
   assert.match(styles, /\.horse-details__actions\{position:relative;z-index:5/);
   assert.match(styles, /\.quick-capture\[open\]\{display:flex;flex-direction:column/);
   assert.match(styles, /\.upload-drop input\[type="file"\],\.capture-file input\[type="file"\]\{[^}]*width:100%/);

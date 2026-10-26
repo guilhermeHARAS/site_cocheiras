@@ -342,7 +342,11 @@ function horseIdentityHeader(horse, stage, status, detail = '') {
 }
 
 function commonActions(horse) {
-  return '<div class="card-actions"><button data-action="edit" data-id="' + horse.id + '">Editar</button><button data-action="delete" data-id="' + horse.id + '">Excluir</button></div>';
+  const previous = { training: 'foals', ready: 'training' }[horse.stage];
+  const back = previous
+    ? '<button data-action="previous-stage" data-target="' + previous + '" data-id="' + horse.id + '">' + uiIcon('arrow-left') + '<span>Voltar etapa</span></button>'
+    : '';
+  return '<div class="card-actions">' + back + '<button data-action="edit" data-id="' + horse.id + '">Editar</button><button data-action="delete" data-id="' + horse.id + '">Excluir</button></div>';
 }
 
 function creationCard(horse) {
@@ -380,8 +384,8 @@ function trainingCard(horse) {
     '<div class="progress" role="progressbar" aria-label="Progresso de treinos" aria-valuemin="0" aria-valuemax="60" aria-valuenow="', Math.min(workouts, 60), '"><span style="width:', percentage, '%"></span></div>',
     '<div class="horse-card__meta"><span>', percentage, '% da meta</span>', done ? '<b>Meta alcançada</b>' : '', '</div>',
     '<p class="horse-card__date">Último treino: ', formatDate(horse.lastWorkout, 'Nenhum registrado'), '</p>',
-    '<div class="workout-actions"><button class="button button--soft" data-action="workout-minus" data-id="', horse.id, '" aria-label="Descontar um treino" ', workouts < 1 ? 'disabled' : '', '>', uiIcon('minus'), '</button>',
-    '<button class="button button--primary" data-action="workout-plus" data-id="', horse.id, '" aria-label="Adicionar um treino">', uiIcon('plus'), '</button></div>',
+    '<div class="workout-actions"><button class="button button--soft" data-action="workout-minus" data-id="', horse.id, '" aria-label="Descontar um treino" ', workouts < 1 ? 'disabled' : '', '>', uiIcon('minus'), '<span>Descontar treino</span></button>',
+    '<button class="button button--primary" data-action="workout-plus" data-id="', horse.id, '" aria-label="Somar um treino">', uiIcon('plus'), '<span>Somar treino</span></button></div>',
     done ? '<button class="button button--gold button--wide transfer-button" data-action="to-ready" data-id="' + horse.id + '">Enviar para tropa pronta</button>' : '',
     commonActions(horse), '</div></article>',
   ].join('');
@@ -462,8 +466,7 @@ function openHorseDetails(horse) {
   const training = isTraining ? '<section class="horse-detail-training"><div><span>PROGRESSO DE TREINAMENTO</span><strong>' + workouts + ' de ' + GOAL + ' treinos</strong></div><div class="progress"><span style="width:' + percentage + '%"></span></div><small>' + percentage + '% da meta</small></section>' : '';
   const ready = isReady ? '<div class="horse-detail-ready"><img class="ready-inline-icon" src="/icons/polo-sem-dobras-camisa.png?v=v4" alt="" aria-hidden="true"><strong>Pronto para torneio</strong></div>' : '';
   $('#horseDetailsBody').innerHTML = [
-    '<div class="horse-detail-stage">', escapeHtml(stage.title), '</div>', ready,
-    summary, pedigree, missing, training,
+    ready, summary, pedigree, missing, training,
     horse.notes ? '<section class="horse-detail-notes"><span>OBSERVAÇÕES</span><p>' + escapeHtml(horse.notes) + '</p></section>' : '',
   ].join('');
   $('#horseDetailsModal').showModal();
@@ -1155,6 +1158,15 @@ $('#horseGrid').addEventListener('click', async event => {
     await loadHorses();
     toast('Cadastro excluído.');
   }, true);
+  if (action === 'previous-stage') {
+    const target = button.dataset.target;
+    const destination = STAGES[target]?.title || 'a etapa anterior';
+    return ask('Voltar para a etapa anterior', 'Deseja mover ' + horse.name + ' para ' + destination + '? Todos os dados e treinos serão preservados.', async () => {
+      await api.transition(horse.id, target);
+      await loadHorses();
+      toast(horse.name + ' voltou para ' + destination + '.');
+    });
+  }
   if (action === 'to-training') return ask('Iniciar treinamento', 'Deseja mover ' + horse.name + ' para Preparação e Treinamento?', async () => {
     await api.transition(horse.id, 'training');
     await loadHorses();

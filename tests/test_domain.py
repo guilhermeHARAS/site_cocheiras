@@ -107,6 +107,25 @@ class LifecycleTests(unittest.TestCase):
         change_workout(horse, -1)
         self.assertEqual(horse["workouts"], 0)
 
+    def test_horse_can_return_one_stage_without_losing_workouts(self):
+        horse = validate_horse({"stage": "training", "name": "Retorno", "age": 4, "workouts": 23}, stage="training")
+        horse_id = horse["id"]
+        transition_horse(horse, "foals", reference_date="2026-10-26")
+        self.assertEqual(horse["stage"], "foals")
+        self.assertEqual(horse["workouts"], 23)
+        self.assertEqual(horse["id"], horse_id)
+        self.assertEqual(horse["stageHistory"][-1]["direction"], "backward")
+
+        horse["stage"] = "ready"
+        transition_horse(horse, "training", reference_date="2026-10-26")
+        self.assertEqual(horse["stage"], "training")
+        self.assertEqual(horse["workouts"], 23)
+
+    def test_horse_cannot_return_from_foals_to_reproduction(self):
+        horse = validate_horse({"stage": "foals", "name": "Nascido", "age": 1}, stage="foals")
+        with self.assertRaises(ValueError):
+            transition_horse(horse, "creation")
+
     def test_repeated_mutation_is_applied_once(self):
         state = normalize_state({"horses": []}, reference_date="2026-10-13")
         counter = {"value": 0}

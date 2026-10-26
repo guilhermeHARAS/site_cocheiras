@@ -347,6 +347,7 @@ body{font-size:calc(15px * var(--font-scale))}
 .horse-card__age,.horse-card__breed,.horse-card__owner{font-size:calc(11px * var(--font-scale))}
 .horse-card .button{min-height:calc(39px * var(--font-scale));padding-block:6px;font-size:calc(11px * var(--font-scale));line-height:1.2;white-space:normal}
 .horse-card .button--soft,.card-actions button{font-size:calc(10px * var(--font-scale))}
+.card-actions button{display:inline-flex;align-items:center;justify-content:center;gap:4px}.card-actions .ui-icon{width:12px;height:12px}.workout-actions .button{display:inline-flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap}.workout-actions .button span{font-size:inherit}
 .button{padding-block:7px;line-height:1.2;white-space:normal}
 .field input,.field select,.field textarea{font-size:calc(14px * var(--font-scale))}
 .horse-detail-item span,.horse-detail-training span,.horse-detail-notes>span,.horse-detail-pedigree>p{font-size:calc(8px * var(--font-scale))}
@@ -374,9 +375,9 @@ body{font-size:calc(15px * var(--font-scale))}
 }
 
 /* Modais responsivos: ações da ficha sempre visíveis e somente o conteúdo rola. */
-.horse-details[open]{display:flex;flex-direction:column;width:min(720px,calc(100% - 24px));height:min(92dvh,900px);max-height:92dvh;overflow:hidden}
+.horse-details[open]{display:flex;flex-direction:column;width:min(720px,calc(100% - 24px));height:fit-content!important;min-height:0!important;max-height:92dvh;overflow:hidden}
 .horse-details>.modal__head,.horse-details__actions{flex:0 0 auto}
-.horse-details__body{flex:1 1 auto;min-height:0;max-height:none;overflow-y:auto;overscroll-behavior:contain}
+.horse-details__body{flex:0 1 auto;min-height:0;max-height:none;overflow-y:auto;overscroll-behavior:contain}
 .horse-details__actions{position:relative;z-index:5;margin:0;padding-bottom:max(13px,env(safe-area-inset-bottom));box-shadow:0 -10px 24px rgba(2,18,12,.2)}
 
 /* Arquivos sempre permanecem dentro do quadro de Cadastro rápido. */
@@ -388,7 +389,7 @@ body{font-size:calc(15px * var(--font-scale))}
 .upload-drop input[type="file"],.capture-file input[type="file"]{display:block;width:100%;min-width:0;max-width:100%;overflow:hidden;padding:7px;border:1px solid #d5d2c9;border-radius:8px;background:#fff;color:var(--muted);font-size:max(11px,calc(10px * var(--font-scale)))!important}
 .upload-drop input[type="file"]::file-selector-button,.capture-file input[type="file"]::file-selector-button{max-width:100%;margin-right:8px;border:0;border-radius:7px;background:var(--forest);color:#fff;padding:8px 10px;font:700 11px/1.2 var(--text);white-space:normal;cursor:pointer}
 @media(max-width:620px){
-  .horse-details[open]{width:calc(100% - 12px);height:calc(100dvh - 12px);max-height:calc(100dvh - 12px);margin:6px auto}
+  .horse-details[open]{width:calc(100% - 12px);height:fit-content!important;min-height:0!important;max-height:calc(100dvh - 12px);margin:6px auto}
   .horse-details__body{padding:12px}
   .horse-details__actions{padding:9px 10px max(9px,env(safe-area-inset-bottom))}
   .quick-capture[open]{width:calc(100% - 12px);height:calc(100dvh - 12px);max-height:calc(100dvh - 12px);margin:6px auto}

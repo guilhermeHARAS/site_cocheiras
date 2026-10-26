@@ -20,6 +20,10 @@ TRANSITIONS = {
     "foals": "training",
     "training": "ready",
 }
+REVERSE_TRANSITIONS = {
+    "training": "foals",
+    "ready": "training",
+}
 MAX_MUTATIONS = 600
 ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
@@ -284,11 +288,13 @@ def transition_horse(
     today = reference_date or today_iso()
     data = payload or {}
     source = horse.get("stage") or "training"
-    if TRANSITIONS.get(source) != target:
+    forward = TRANSITIONS.get(source) == target
+    backward = REVERSE_TRANSITIONS.get(source) == target
+    if not forward and not backward:
         if source == target:
             return horse
         raise ValueError("Essa mudança de etapa não é permitida.")
-    if source == "training" and int(horse.get("workouts", 0)) < 60:
+    if forward and source == "training" and int(horse.get("workouts", 0)) < 60:
         raise ValueError("O cavalo precisa ter pelo menos 60 treinos.")
     if source == "creation":
         actual = _birth_date(data.get("birthDate"), today)
@@ -307,6 +313,7 @@ def transition_horse(
         "from": source,
         "to": target,
         "at": datetime.now().astimezone().isoformat(timespec="seconds"),
+        "direction": "backward" if backward else "forward",
         "expectedBirthDate": horse.get("expectedBirthDate") if source == "creation" else None,
     })
     return horse
