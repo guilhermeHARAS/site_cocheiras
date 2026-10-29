@@ -7,8 +7,10 @@ import { ageLabel } from '../frontend/lifecycle.js';
 const root = fileURLToPath(new URL('..', import.meta.url));
 
 test('idade exata respeita o aniversário', () => {
-  assert.equal(ageLabel({ birthDate: '2023-10-20' }, new Date('2026-10-13T12:00:00')), '2 anos');
+  assert.equal(ageLabel({ birthDate: '2023-10-20' }, new Date('2026-10-13T12:00:00')), '2 anos e 11 meses');
   assert.equal(ageLabel({ birthDate: '2023-10-10' }, new Date('2026-10-13T12:00:00')), '3 anos');
+  assert.equal(ageLabel({ birthDate: '2025-04-13' }, new Date('2026-10-13T12:00:00')), '1 ano e 6 meses');
+  assert.equal(ageLabel({ birthDate: '2025-09-13' }, new Date('2026-10-13T12:00:00')), '1 ano e 1 mês');
 });
 
 test('animal com menos de um ano aparece em meses', () => {
@@ -114,6 +116,10 @@ test('cavalos são ordenados por nome e depois por idade', () => {
 
 test('cartões permitem voltar etapa e controles de treino têm textos claros', () => {
   const app = readFileSync(`${root}/frontend/app.js`, 'utf8');
+  const html = readFileSync(`${root}/frontend/index.html`, 'utf8');
+  assert.match(app, /const GOAL = 80;/);
+  assert.match(app, /aria-valuemax="', GOAL/);
+  assert.match(html, /Meta de 80 treinos/);
   assert.match(app, /data-action="previous-stage"/);
   assert.match(app, />Voltar etapa</);
   assert.match(app, />Descontar treino</);
@@ -277,7 +283,7 @@ test('ficha gera cartão em PNG e compartilha pelo WhatsApp', () => {
 test('ficha mantém ações visíveis e arquivos não escapam do cadastro rápido', () => {
   const html = readFileSync(`${root}/frontend/index.html`, 'utf8');
   const styles = readFileSync(`${root}/frontend/styles.css`, 'utf8');
-  assert.match(html, /styles\.css\?v=85/);
+  assert.match(html, /styles\.css\?v=87/);
   assert.match(styles, /\.horse-details\[open\]\{display:flex;flex-direction:column/);
   assert.match(styles, /\.horse-details__body\{flex:0 1 auto;min-height:0;max-height:none;overflow-y:auto/);
   assert.match(styles, /\.horse-details__body\{grid-auto-flow:row;grid-auto-rows:max-content;align-content:start\}/);

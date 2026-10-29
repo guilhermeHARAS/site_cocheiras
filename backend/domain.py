@@ -8,6 +8,7 @@ from datetime import date, datetime
 from typing import Any, Callable
 
 SCHEMA_VERSION = 8
+TRAINING_GOAL = 80
 STAGES = ("creation", "foals", "training", "ready")
 STAGE_LABELS = {
     "creation": "Reprodução",
@@ -294,8 +295,8 @@ def transition_horse(
         if source == target:
             return horse
         raise ValueError("Essa mudança de etapa não é permitida.")
-    if forward and source == "training" and int(horse.get("workouts", 0)) < 60:
-        raise ValueError("O cavalo precisa ter pelo menos 60 treinos.")
+    if forward and source == "training" and int(horse.get("workouts", 0)) < TRAINING_GOAL:
+        raise ValueError(f"O cavalo precisa ter pelo menos {TRAINING_GOAL} treinos.")
     if source == "creation":
         actual = _birth_date(data.get("birthDate"), today)
         if not actual:

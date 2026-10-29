@@ -6,7 +6,10 @@ export function ageLabel(horse, now = new Date()) {
     months = Math.max(0, months);
     if (months < 12) return `${months} ${months === 1 ? 'mês' : 'meses'}`;
     const years = Math.floor(months / 12);
-    return `${years} ${years === 1 ? 'ano' : 'anos'}`;
+    const remainingMonths = months % 12;
+    const yearsLabel = `${years} ${years === 1 ? 'ano' : 'anos'}`;
+    if (!remainingMonths) return yearsLabel;
+    return `${yearsLabel} e ${remainingMonths} ${remainingMonths === 1 ? 'mês' : 'meses'}`;
   }
   if (horse.age !== null && horse.age !== undefined && horse.age !== '') {
     let years = Number(horse.age) || 0;

@@ -7,6 +7,7 @@ from datetime import date
 from typing import Any
 
 from audit_assistant import answer_audit_question, is_audit_question
+from domain import TRAINING_GOAL
 from finance_assistant import answer_financial_question, is_finance_question
 
 STAGE_NAMES = {
@@ -67,8 +68,11 @@ def _age(horse: dict[str, Any], today: date) -> str:
         months = (today.year - born.year) * 12 + today.month - born.month - (today.day < born.day)
         if months < 12:
             return f"{max(0, months)} " + ("mês" if months == 1 else "meses")
-        years = today.year - born.year - ((today.month, today.day) < (born.month, born.day))
-        return f"{years} " + ("ano" if years == 1 else "anos")
+        years, remaining_months = divmod(months, 12)
+        label = f"{years} " + ("ano" if years == 1 else "anos")
+        if not remaining_months:
+            return label
+        return label + f" e {remaining_months} " + ("mês" if remaining_months == 1 else "meses")
     if horse.get("age") is not None:
         years = int(horse["age"])
         reference = horse.get("ageRecordedAt")
@@ -280,8 +284,8 @@ def answer_question(
         if horse:
             workouts = int(horse.get("workouts", 0) or 0)
             if query.startswith("faltam"):
-                missing = max(0, 60 - workouts)
-                return _result(f"Faltam {missing} treinos para {horse.get('name')} atingir a meta de 60.", [horse], "workouts")
+                missing = max(0, TRAINING_GOAL - workouts)
+                return _result(f"Faltam {missing} treinos para {horse.get('name')} atingir a meta de {TRAINING_GOAL}.", [horse], "workouts")
             return _result(f"{horse.get('name')} tem {workouts} treinos registrados.", [horse], "workouts")
 
     age_match = re.search(r"(?:qual (?:e )?a idade|quantos anos (?:tem )?|idade) (?:do|da|de )?(.+)$", query)
@@ -303,10 +307,10 @@ def answer_question(
             return _result(f"A localização atual de {horse.get('name')} ainda não foi informada.", [horse], "location")
         return _result(f"{horse.get('name')} está em {location}.", [horse], "location")
 
-    if any(term in query for term in ("60 treinos", "meta de treinos", "meta dos treinos", "pode ir para tropa", "prontos para ir")):
-        found = [horse for horse in horses if horse.get("stage") == "training" and int(horse.get("workouts", 0) or 0) >= 60]
+    if any(term in query for term in ("80 treinos", "meta de treinos", "meta dos treinos", "pode ir para tropa", "prontos para ir")):
+        found = [horse for horse in horses if horse.get("stage") == "training" and int(horse.get("workouts", 0) or 0) >= TRAINING_GOAL]
         if not found:
-            return _result("Nenhum cavalo em treinamento atingiu 60 treinos ainda.", intent="workouts")
+            return _result(f"Nenhum cavalo em treinamento atingiu {TRAINING_GOAL} treinos ainda.", intent="workouts")
         return _result(f"{len(found)} podem ser enviados para a Tropa pronta: {_names(found)}.", found, "workouts")
 
     if "mais treinos" in query:

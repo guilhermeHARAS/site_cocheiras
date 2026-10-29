@@ -96,10 +96,10 @@ class LifecycleTests(unittest.TestCase):
         self.assertEqual(horse["workouts"], 0)
         with self.assertRaises(ValueError):
             transition_horse(horse, "ready")
-        horse["workouts"] = 60
+        horse["workouts"] = 80
         transition_horse(horse, "ready", reference_date="2030-01-01")
         self.assertEqual(horse["stage"], "ready")
-        self.assertEqual(horse["workouts"], 60)
+        self.assertEqual(horse["workouts"], 80)
         self.assertEqual(horse["id"], original_id)
 
     def test_workout_never_becomes_negative(self):

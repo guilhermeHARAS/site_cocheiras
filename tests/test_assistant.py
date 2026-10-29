@@ -12,7 +12,7 @@ from assistant import answer_question
 class AssistantTests(unittest.TestCase):
     def setUp(self):
         self.horses = [
-            {"id": "1", "name": "Aurora", "father": "Trovão", "mother": "Estrela", "stage": "training", "workouts": 60, "age": 3, "ageRecordedAt": "2026-10-13", "location": "Baia 7"},
+            {"id": "1", "name": "Aurora", "father": "Trovão", "mother": "Estrela", "stage": "training", "workouts": 80, "age": 3, "ageRecordedAt": "2026-10-13", "location": "Baia 7"},
             {"id": "2", "name": "Raio", "father": "Trovão", "mother": "Lua", "stage": "foals", "workouts": 0, "birthDate": "2026-04-13"},
             {"id": "3", "name": "Sol", "father": "Vento", "mother": "Estrela", "stage": "ready", "workouts": 72, "age": 5, "ageRecordedAt": "2025-01-01"},
         ]
@@ -58,7 +58,7 @@ class AssistantTests(unittest.TestCase):
         self.assertIn("Tropa pronta: 1", result["answer"])
 
     def test_reports_horses_that_reached_goal(self):
-        result = answer_question(self.horses, "Quem já atingiu 60 treinos?")
+        result = answer_question(self.horses, "Quem já atingiu 80 treinos?")
         self.assertEqual(result["matches"], ["1"])
 
     def test_ambiguous_birth_period_offers_expected_or_actual(self):
@@ -104,6 +104,10 @@ class AssistantTests(unittest.TestCase):
     def test_informed_age_progresses(self):
         result = answer_question(self.horses, "Qual a idade de Aurora?", reference_date="2027-10-13")
         self.assertIn("4 anos", result["answer"])
+
+    def test_exact_birth_date_reports_years_and_months(self):
+        result = answer_question(self.horses, "Qual a idade de Raio?", reference_date="2027-10-13")
+        self.assertIn("1 ano e 6 meses", result["answer"])
 
     def test_answers_current_location(self):
         result = answer_question(self.horses, "Onde está Aurora?")

@@ -2,7 +2,7 @@ import { api } from './api.js';
 import { ageLabel } from './lifecycle.js';
 import { initializeQuickCapture } from './quick-capture.js';
 
-const GOAL = 60;
+const GOAL = 80;
 const STAGES = {
   creation: { title: 'Reprodução', description: 'Cruzas e previsões de nascimento.', overline: 'ETAPA 1 DE 4', add: 'Nova cruza' },
   foals: { title: 'Potros e Desenvolvimento', description: 'Animais em fase de crescimento.', overline: 'ETAPA 2 DE 4', add: 'Novo potro' },
@@ -381,7 +381,7 @@ function trainingCard(horse) {
     horseIdentityHeader(horse, 'training', done ? 'META CONCLUÍDA' : 'EM TREINAMENTO', workouts + ' / ' + GOAL),
     '<div class="horse-card__body">',
     '<p class="horse-card__age">', escapeHtml(ageLabel(horse)), '</p>',
-    '<div class="progress" role="progressbar" aria-label="Progresso de treinos" aria-valuemin="0" aria-valuemax="60" aria-valuenow="', Math.min(workouts, 60), '"><span style="width:', percentage, '%"></span></div>',
+    '<div class="progress" role="progressbar" aria-label="Progresso de treinos" aria-valuemin="0" aria-valuemax="', GOAL, '" aria-valuenow="', Math.min(workouts, GOAL), '"><span style="width:', percentage, '%"></span></div>',
     '<div class="horse-card__meta"><span>', percentage, '% da meta</span>', done ? '<b>Meta alcançada</b>' : '', '</div>',
     '<p class="horse-card__date">Último treino: ', formatDate(horse.lastWorkout, 'Nenhum registrado'), '</p>',
     '<div class="workout-actions"><button class="button button--soft" data-action="workout-minus" data-id="', horse.id, '" aria-label="Descontar um treino" ', workouts < 1 ? 'disabled' : '', '>', uiIcon('minus'), '<span>Descontar treino</span></button>',
