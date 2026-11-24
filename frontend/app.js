@@ -1,6 +1,6 @@
-import { api } from './api.js';
-import { ageLabel } from './lifecycle.js';
-import { initializeQuickCapture } from './quick-capture.js';
+import { api } from './api.js?v=88';
+import { ageLabel } from './lifecycle.js?v=88';
+import { initializeQuickCapture } from './quick-capture.js?v=88';
 
 const GOAL = 80;
 const STAGES = {
@@ -325,9 +325,9 @@ function pedigree(horse) {
 function horseIdentityHeader(horse, stage, status, detail = '') {
   const parents = [horse.father, horse.mother].filter(Boolean).map(escapeHtml).join(' × ');
   const silhouettes = {
-    foals: '/icons/potros-tropa-final-contorno-principal-2x.png?v=v4',
-    training: '/icons/cavalo-treinamento-v6.png?v=v6',
-    ready: '/icons/polo-sem-dobras-camisa.png?v=v4',
+    foals: '/icons/potros-tropa-final-contorno-principal-2x.png?v=88',
+    training: '/icons/cavalo-treinamento-v6.png?v=88',
+    ready: '/icons/polo-sem-dobras-camisa.png?v=88',
   };
   const silhouette = silhouettes[stage] || silhouettes.foals;
   return [
@@ -405,7 +405,7 @@ function readyGroupHeader(count) {
   const label = count === 1 ? 'cavalo pronto' : 'cavalos prontos';
   return [
     '<header class="ready-group__head">',
-    '<span class="ready-group__icon" aria-hidden="true"><img src="/icons/polo-sem-dobras-camisa.png?v=v4" alt=""></span>',
+    '<span class="ready-group__icon" aria-hidden="true"><img src="/icons/polo-sem-dobras-camisa.png?v=88" alt=""></span>',
     '<div><span>GRUPO DE COMPETIÇÃO</span><h2>Tropa pronta para torneio</h2>',
     '<p>Animais que concluíram a preparação e integram a tropa pronta.</p></div>',
     '<strong><b>', count, '</b><span>', label, '</span></strong>',
@@ -464,7 +464,7 @@ function openHorseDetails(horse) {
   const missingLabel = missingFields.length === 1 ? '1 informação ainda não preenchida' : missingFields.length + ' informações ainda não preenchidas';
   const missing = missingFields.length ? '<section class="horse-detail-missing"><div><span>CADASTRO INCOMPLETO</span><strong>' + missingLabel + '</strong><p>' + escapeHtml(missingFields.join(', ')) + '</p></div><button class="button button--soft" type="button" data-complete-details>Completar cadastro</button></section>' : '';
   const training = isTraining ? '<section class="horse-detail-training"><div><span>PROGRESSO DE TREINAMENTO</span><strong>' + workouts + ' de ' + GOAL + ' treinos</strong></div><div class="progress"><span style="width:' + percentage + '%"></span></div><small>' + percentage + '% da meta</small></section>' : '';
-  const ready = isReady ? '<div class="horse-detail-ready"><img class="ready-inline-icon" src="/icons/polo-sem-dobras-camisa.png?v=v4" alt="" aria-hidden="true"><strong>Pronto para torneio</strong></div>' : '';
+  const ready = isReady ? '<div class="horse-detail-ready"><img class="ready-inline-icon" src="/icons/polo-sem-dobras-camisa.png?v=88" alt="" aria-hidden="true"><strong>Pronto para torneio</strong></div>' : '';
   $('#horseDetailsBody').innerHTML = [
     ready, summary, pedigree, missing, training,
     horse.notes ? '<section class="horse-detail-notes"><span>OBSERVAÇÕES</span><p>' + escapeHtml(horse.notes) + '</p></section>' : '',

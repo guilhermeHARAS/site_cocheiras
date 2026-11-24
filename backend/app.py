@@ -690,7 +690,9 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(HTTPStatus.OK)
         self.send_header("Content-Type", f"{mime}; charset=utf-8" if mime.startswith("text/") or mime in ("application/javascript", "application/manifest+json") else mime)
         self.send_header("Content-Length", str(len(content)))
-        self.send_header("Cache-Control", "no-cache")
+        versioned = bool(parse_qs(urlparse(self.path).query).get("v"))
+        cache_control = "public, max-age=31536000, immutable" if versioned else "no-cache"
+        self.send_header("Cache-Control", cache_control)
         self.end_headers()
         self.wfile.write(content)
 

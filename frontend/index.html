@@ -12,7 +12,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400..800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/styles.css?v=87">
+  <link rel="stylesheet" href="/styles.css?v=88">
+  <link rel="preload" as="image" href="/icons/potros-tropa-final-contorno-principal-2x.png?v=88">
+  <link rel="preload" as="image" href="/icons/cavalo-treinamento-v6.png?v=88">
+  <link rel="preload" as="image" href="/icons/polo-sem-dobras-camisa.png?v=88">
 </head>
 <body>
   <svg class="ui-icon-sprite" aria-hidden="true">
@@ -84,19 +87,19 @@
 
       <nav class="stage-menu" id="stageTimeline" aria-label="Etapas dos cavalos">
         <button class="stage-card" data-stage="creation" type="button">
-          <span class="stage-card__step">01</span><span class="stage-card__icon" aria-hidden="true"><img src="/icons/cruzas-microscopio.png" alt=""></span>
+          <span class="stage-card__step">01</span><span class="stage-card__icon" aria-hidden="true"><img src="/icons/cruzas-microscopio.png?v=88" alt=""></span>
           <span class="stage-card__name">Reprodução</span><span class="stage-card__hint">Cruzas e previsões de nascimento</span><span class="stage-card__quantity"><span>Quantidade</span><strong id="count-creation">0</strong></span>
         </button>
         <button class="stage-card" data-stage="foals" type="button">
-          <span class="stage-card__step">02</span><span class="stage-card__icon" aria-hidden="true"><img src="/icons/potros-tropa-final-contorno-principal-2x.png?v=v4" alt=""></span>
+          <span class="stage-card__step">02</span><span class="stage-card__icon" aria-hidden="true"><img src="/icons/potros-tropa-final-contorno-principal-2x.png?v=88" alt=""></span>
           <span class="stage-card__name">Potros e Desenvolvimento</span><span class="stage-card__hint">Animais em fase de crescimento</span><span class="stage-card__quantity"><span>Quantidade</span><strong id="count-foals">0</strong></span>
         </button>
         <button class="stage-card" data-stage="training" type="button">
-          <span class="stage-card__step">03</span><span class="stage-card__icon" aria-hidden="true"><img src="/icons/cavalo.png?v=v11-base-v6" alt=""></span>
+          <span class="stage-card__step">03</span><span class="stage-card__icon" aria-hidden="true"><img src="/icons/cavalo.png?v=88" alt=""></span>
           <span class="stage-card__name">Preparação e Treinamento</span><span class="stage-card__hint">Controle dos treinos</span><span class="stage-card__quantity"><span>Quantidade</span><strong id="count-training">0</strong></span>
         </button>
         <button class="stage-card" data-stage="ready" type="button">
-          <span class="stage-card__step">04</span><span class="stage-card__icon" aria-hidden="true"><img src="/icons/polo-sem-dobras-camisa.png?v=v4" alt=""></span>
+          <span class="stage-card__step">04</span><span class="stage-card__icon" aria-hidden="true"><img src="/icons/polo-sem-dobras-camisa.png?v=88" alt=""></span>
           <span class="stage-card__name">Tropa pronta</span><span class="stage-card__hint">Cavalos prontos para torneio</span><span class="stage-card__quantity"><span>Quantidade</span><strong id="count-ready">0</strong></span>
         </button>
       </nav>
@@ -447,6 +450,6 @@
 
   <div class="toasts" id="toasts" aria-live="polite"></div>
   <div class="confetti" id="confetti"></div>
-  <script type="module" src="/app.js?v=87"></script>
+  <script type="module" src="/app.js?v=88"></script>
 </body>
 </html>

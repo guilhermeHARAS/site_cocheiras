@@ -205,8 +205,16 @@ test('cartões de treinamento usam o cavalo v6 exclusivo', () => {
   const serviceWorker = readFileSync(`${root}/frontend/sw.js`, 'utf8');
   const icon = `${root}/frontend/icons/cavalo-treinamento-v6.png`;
   assert.equal(existsSync(icon), true);
-  assert.match(app, /training:\s*'\/icons\/cavalo-treinamento-v6\.png\?v=v6'/);
-  assert.match(serviceWorker, /cavalo-treinamento-v6\.png\?v=v6/);
+  assert.match(app, /training:\s*'\/icons\/cavalo-treinamento-v6\.png\?v=88'/);
+  assert.match(serviceWorker, /cavalo-treinamento-v6\.png\?v=88/);
+});
+
+test('ícones são antecipados e servidos primeiro pelo cache local', () => {
+  const html = readFileSync(`${root}/frontend/index.html`, 'utf8');
+  const serviceWorker = readFileSync(`${root}/frontend/sw.js`, 'utf8');
+  assert.match(html, /rel="preload" as="image" href="\/icons\/cavalo-treinamento-v6\.png\?v=88"/);
+  assert.match(serviceWorker, /cocheira-radames-v88/);
+  assert.match(serviceWorker, /caches\.match\(event\.request\)\.then\(hit => hit \|\| refresh\)/);
 });
 
 test('tropa pronta forma um grande cartão com cartões individuais', () => {
@@ -283,7 +291,7 @@ test('ficha gera cartão em PNG e compartilha pelo WhatsApp', () => {
 test('ficha mantém ações visíveis e arquivos não escapam do cadastro rápido', () => {
   const html = readFileSync(`${root}/frontend/index.html`, 'utf8');
   const styles = readFileSync(`${root}/frontend/styles.css`, 'utf8');
-  assert.match(html, /styles\.css\?v=87/);
+  assert.match(html, /styles\.css\?v=88/);
   assert.match(styles, /\.horse-details\[open\]\{display:flex;flex-direction:column/);
   assert.match(styles, /\.horse-details__body\{flex:0 1 auto;min-height:0;max-height:none;overflow-y:auto/);
   assert.match(styles, /\.horse-details__body\{grid-auto-flow:row;grid-auto-rows:max-content;align-content:start\}/);
